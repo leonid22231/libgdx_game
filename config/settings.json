@@ -1,0 +1,11 @@
+{
+    "controll":{
+        "keyboard": {
+            "up": 12,
+            "down":13,
+            "left":12,
+            "right": 1
+        },
+        "gamepad": {}
+    }
+}

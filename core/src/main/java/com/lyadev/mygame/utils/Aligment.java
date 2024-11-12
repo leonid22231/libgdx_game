@@ -1,0 +1,5 @@
+package com.lyadev.mygame.utils;
+
+public enum Aligment{
+    TOP_CENTER,TOP_LEFT,TOP_RIGHT,BOTTOM_CENTER,BOTTOM_LEFT,BOTTOM_RIGHT,CENTER, CENTER_LEFT, CENTER_RIGHT;
+}
