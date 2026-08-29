@@ -16,43 +16,54 @@ import lombok.Setter;
 @Setter
 public class EntityTexture {
     private int regionsCount = 0;
-    private int scaleFactor = 0;
     private int currentSpriteIndex = 0;
     private Size textureSize = Size.ENTITY_DEFAULT;
     private List<TextureRegion> allTextureRegions = new ArrayList<>();
+    private Texture sheetTexture;
 
     public void init(EntitySettings settings) {
         int frameWidth = settings.getTextureSize().getWidth();
         int frameHeight = settings.getTextureSize().getHeight();
         String textureString = settings.getTexture();
 
-        Texture texture = new Texture(textureString);
-        TextureRegion sheetRegion = new TextureRegion(texture);
+        sheetTexture = new Texture(textureString);
+        TextureRegion sheetRegion = new TextureRegion(sheetTexture);
         regionsCount = sheetRegion.getRegionWidth() / frameWidth;
 
-        if(!texture.getTextureData().isPrepared()){
-            texture.getTextureData().prepare();
+        if(!sheetTexture.getTextureData().isPrepared()){
+            sheetTexture.getTextureData().prepare();
         }
-        Pixmap pixmap = texture.getTextureData().consumePixmap();
-
-        int minTopOffset = frameHeight;
-        for(int i = 0; i < regionsCount; i++){
-            int topOffset = calculateTopTransparentRows(pixmap, i * frameWidth, frameWidth, frameHeight);
-            if(topOffset < minTopOffset){
-                minTopOffset = topOffset;
+        Pixmap pixmap = sheetTexture.getTextureData().consumePixmap();
+        try {
+            int minTopOffset = frameHeight;
+            for(int i = 0; i < regionsCount; i++){
+                int topOffset = calculateTopTransparentRows(pixmap, i * frameWidth, frameWidth, frameHeight);
+                if(topOffset < minTopOffset){
+                    minTopOffset = topOffset;
+                }
+                int croppedHeight = frameHeight - topOffset;
+                TextureRegion frameRegion = new TextureRegion(sheetTexture);
+                frameRegion.setRegion(i * frameWidth, topOffset, frameWidth, croppedHeight);
+                allTextureRegions.add(frameRegion);
             }
-            int croppedHeight = frameHeight - topOffset;
-            TextureRegion frameRegion = new TextureRegion(texture);
-            frameRegion.setRegion(i * frameWidth, topOffset, frameWidth, croppedHeight);
-            allTextureRegions.add(frameRegion);
-        }
 
-        Size minSizeFromTexture = new Size(frameWidth, frameHeight - minTopOffset);
-        textureSize = minSizeFromTexture.getSizeFromScaleFactor(settings.getTextureScaleFactor());
+            Size minSizeFromTexture = new Size(frameWidth, frameHeight - minTopOffset);
+            textureSize = minSizeFromTexture.getSizeFromScaleFactor(settings.getTextureScaleFactor());
+        } finally {
+            pixmap.dispose();
+        }
     }
 
     public TextureRegion getCurrentTexture() {
         return allTextureRegions.get(currentSpriteIndex);
+    }
+
+    public void dispose() {
+        if(sheetTexture != null){
+            sheetTexture.dispose();
+            sheetTexture = null;
+        }
+        allTextureRegions.clear();
     }
 
     private int calculateTopTransparentRows(Pixmap pixmap, int regionX, int regionWidth, int regionHeight) {

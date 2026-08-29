@@ -22,10 +22,9 @@ import lombok.Setter;
 @Setter
 public class EntityListenerThread extends Thread {
     private long startTime = TimeUtils.millis();
-    private long errorTime = 0;
     private long runningTime = 0;
     private boolean active = true;
-    private Object entity;
+    private Entity entity;
     private List<EntityListenerThread> allThreads;
     private LineFromRect[] lines;
     private boolean isInitilize = false;
@@ -36,12 +35,8 @@ public class EntityListenerThread extends Thread {
         start();
     }
 
-    public void setEntity(Object entity) {
+    public void setEntity(Entity entity) {
         this.entity = entity;
-        if(!(entity instanceof Entity)){
-            Gdx.app.error(String.format("Thread[%s]", getName()),
-                    "Unsupported entity type: " + entity.getClass().getName());
-        }
     }
 
     @Override
@@ -70,26 +65,25 @@ public class EntityListenerThread extends Thread {
                 }
             }
 
-            if(entity instanceof Entity){
-                Entity observer = (Entity) entity;
-                lines = observer.getVision().getRectLines();
+            if(entity != null){
+                lines = entity.getVision().getRectLines();
                 isInitilize = true;
 
-                if(GlobalWorld.isReady() && observer.getStatus().isActive() && allThreadReady){
-                    VisionModule visionModule = VisionModule.from(observer);
+                if(GlobalWorld.isReady() && entity.getStatus().isActive() && allThreadReady){
+                    VisionModule visionModule = VisionModule.from(entity);
                     if(visionModule != null){
                         float visionScore = visionModule.getVisionScore();
                         CircleSector circleSector = visionModule.getCircleSector();
-                        Position pos = observer.getCenterPosition();
+                        Position pos = entity.getCenterPosition();
 
                         for(EntityListenerThread thread : allThreads){
-                            if(thread.isInitilize && thread.isActive()){
+                            if(thread.isInitilize && thread.isActive() && thread.entity != null){
                                 LineFromRect[] anotherLines = thread.getLines();
-                                if(anotherLines == null || !(thread.entity instanceof Entity)){
+                                if(anotherLines == null){
                                     continue;
                                 }
-                                Entity target = (Entity) thread.entity;
-                                if(target == observer){
+                                Entity target = thread.entity;
+                                if(target == entity){
                                     continue;
                                 }
 
@@ -104,9 +98,9 @@ public class EntityListenerThread extends Thread {
                                 }
                                 LineFromRect[] visibleLines = spottedLines.toArray(new LineFromRect[0]);
                                 if(isEntityVisible){
-                                    observer.getVision().addVisibleEntity(target, visibleLines);
+                                    entity.getVision().addVisibleEntity(target, visibleLines);
                                 } else {
-                                    observer.getVision().removeVisibleEntity(target);
+                                    entity.getVision().removeVisibleEntity(target);
                                 }
                             }
                         }
@@ -120,10 +114,6 @@ public class EntityListenerThread extends Thread {
                 Thread.currentThread().interrupt();
             }
         }
-    }
-
-    public Boolean isInitilize() {
-        return isInitilize;
     }
 
     public LineFromRect[] getLines() {

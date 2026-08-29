@@ -1,7 +1,6 @@
 package com.lyadev.mygame.MyLogger;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.badlogic.gdx.ApplicationLogger;
@@ -53,10 +52,7 @@ public class MyLogger implements ApplicationLogger {
         mousePositionY = y;
         isFocused = mousePositionY < Gdx.graphics.getHeight() && mousePositionY > 0 && mousePositionX < width && mousePositionX > 0;
     }
-    Boolean mouseInBox(){
 
-        return false;
-    }
     public void addKey(String key){
         if(lastKeys.size()<=5){
             lastKeys.add(key);
@@ -83,10 +79,6 @@ public class MyLogger implements ApplicationLogger {
             entries.add(new DebugLogEntry(level, message.tag, message.message));
         }
         return entries;
-    }
-
-    public synchronized List<Message> getMessagesSnapshot() {
-        return new ArrayList<>(messages);
     }
 
     public List<String> collectStatusLines() {
@@ -196,12 +188,6 @@ public class MyLogger implements ApplicationLogger {
         }
         messages.add(new Message(MessageLevel.DEBUG, tag, message));
     }
-    public void setActive(Boolean value){
-        active = value;
-    }
-    public Boolean getActive(){
-        return active;
-    }
 }
 
 class ColumnText {
@@ -215,10 +201,7 @@ class ColumnText {
         this.strings = strings;
         this.messages = messages;
     }
-    public void addString(String string) {
-        strings = Arrays.copyOf(strings, strings.length + 1);
-        strings[strings.length - 1] = string;
-    }
+
     public void draw() {
         String ender = "____________________________";
         float displayHeight = Gdx.graphics.getHeight();
@@ -258,7 +241,7 @@ class ColumnText {
 
         for(Message bottomTest : messages){
             GlyphLayout bottomLayout = Views.preDrawText(bottomTest.toString());
-            sizedBottom.add(layout.height);
+            sizedBottom.add(bottomLayout.height);
             if (maxWidth < bottomLayout.width) {
                 maxWidth = bottomLayout.width;
             } 

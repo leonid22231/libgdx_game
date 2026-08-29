@@ -2,7 +2,6 @@ package com.lyadev.mygame.utils;
 
 public class Position {
     private float x, y;
-    public static final Position DEFAULT = new Position(0, 0);
 
     public Position(float x, float y) {
         this.x = x;

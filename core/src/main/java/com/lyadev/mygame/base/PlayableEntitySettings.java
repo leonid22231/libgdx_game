@@ -29,16 +29,4 @@ public class PlayableEntitySettings extends EntitySettings {
         this.defaultSprintSpeed = defaultSprintSpeed;
         this.visibleRadius = visibleRadius;
     }
-
-    public PlayableEntitySettings copy() {
-        return new PlayableEntitySettings(
-                getTag(),
-                getTexture(),
-                getTextureSize(),
-                getTextureScaleFactor(),
-                moveSettings,
-                defaultWalkSpeed,
-                defaultSprintSpeed,
-                visibleRadius);
-    }
 }

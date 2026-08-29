@@ -23,7 +23,6 @@ public class GlobalWorld {
     public static List<Entity> entities;
     public static Entity player;
     public static List<EntityListener> listeners;
-    public static Place place;
     private static boolean ready = false;
 
     public static boolean isReady() {
@@ -66,17 +65,7 @@ public class GlobalWorld {
         setActivePlayer(man);
         resetVisionState();
 
-        boolean allEntityInit = false;
-
-        while(!allEntityInit){
-            for(Entity entity : entities){
-                if(!entity.getStatus().getIsInit()){
-                    break;
-                }
-                allEntityInit = true;
-            }
-        }
-        place = new Place(new Size(1000, 1000));
+        Place place = new Place(new Size(1000, 1000));
         stage.addActor(place);
         for(Entity entity : entities){
             stage.addActor(entity);
@@ -126,6 +115,8 @@ public class GlobalWorld {
     private static Entity createPlayableEntity(PlayableEntitySettings settings) {
         Entity entity = new Entity(settings);
         PlayableModules.register(entity);
+        entity.finishInit();
+        addEntity(entity);
         return entity;
     }
 
@@ -174,5 +165,4 @@ public class GlobalWorld {
             }
         }
     }
-
 }

@@ -12,15 +12,12 @@ import com.lyadev.mygame.debug.DebugFeatures;
 import com.lyadev.mygame.entity_modules.SelectableModule;
 import com.lyadev.mygame.entity_modules.VisionModule;
 import com.lyadev.mygame.utils.listeners.EntityListener;
-import com.lyadev.mygame.world.GlobalWorld;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 public class Entity extends Actor {
     private EntitySettings settings;
     private EntityTexture texture = new EntityTexture();
@@ -34,7 +31,9 @@ public class Entity extends Actor {
     public Entity(EntitySettings settings) {
         this.settings = settings;
         setTag();
-        GlobalWorld.addEntity(this);
+    }
+
+    public void finishInit() {
         vision.init(this);
         status.setIsInit(true);
     }
@@ -82,8 +81,9 @@ public class Entity extends Actor {
     // NOTE: GLOBAL METHODS
     public void setRandomPositionInScreen() {
         Random random = new Random();
-        float width = size.getWidth();
-        float height = size.getHeight();
+        Size entitySize = getSize();
+        float width = entitySize.getWidth();
+        float height = entitySize.getHeight();
 
         position.setX(width + random.nextFloat() * ((Gdx.graphics.getWidth() - width) - width));
         position.setY(height + random.nextFloat() * ((Gdx.graphics.getHeight() - height) - height));
@@ -105,7 +105,7 @@ public class Entity extends Actor {
 
     // NOTE: Custom GETTERS
     public Position getCenterPosition() {
-        return position.getCenterPositionFromSize(size);
+        return position.getCenterPositionFromSize(getSize());
     }
 
     public Size getSize() {
@@ -143,6 +143,7 @@ public class Entity extends Actor {
         for(EntityModule module : modules){
             module.dispose();
         }
+        texture.dispose();
         EntityListener listener = status.getListener();
         if(listener != null){
             listener.dispose();
@@ -152,10 +153,11 @@ public class Entity extends Actor {
     // NOTE: toString
     @Override
     public String toString() {
+        Size entitySize = getSize();
         return String.format(
                 "%s x[%.3f], y[%.3f], h[%s], w[%s], active[%s], focused[%s], sprite[%s], visibleObjects[%s]",
                 TAG, position.getX(),
-                position.getY(), size.getHeight(), size.getWidth(), status.isActive(), status.getIsFocused(),
+                position.getY(), entitySize.getHeight(), entitySize.getWidth(), status.isActive(), status.getIsFocused(),
                 texture.getCurrentSpriteIndex(), vision.getVisibleEntities().size());
     }
 }

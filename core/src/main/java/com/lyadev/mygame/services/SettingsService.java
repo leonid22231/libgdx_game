@@ -13,16 +13,16 @@ public class SettingsService {
     private final static String TAG = "SettingsService";
 
     public static void init() {
-        boolean loadSettibgs = false;
+        boolean loadSettings = false;
         File file = Gdx.files.internal("config/settings.json").file();
         if (file.exists()) {
             Gdx.app.log(TAG, "Settings file found: " + file.getAbsolutePath());
-            loadSettibgs = true;
+            loadSettings = true;
         } else {
             Gdx.app.log(TAG,
                     String.format("Settings file not found! [%s] Load default settings. ", file.getAbsolutePath()));
         }
-        if (!loadSettibgs)
+        if (!loadSettings)
             return;
         try {
             String json = Files.readString(file.toPath());

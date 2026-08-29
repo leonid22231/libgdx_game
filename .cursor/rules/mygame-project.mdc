@@ -11,7 +11,6 @@ alwaysApply: true
 ## Слои кода
 
 - `base/` — `Entity`, `EntitySettings`, `PlayableEntitySettings`, `EntityVision`, `EntityModule`
-- `player/` — `Player extends Entity` (опциональная обёртка над `PlayableModules`)
 - `world/` — `GlobalWorld` (статические списки и `player`)
 - `entity_modules/` — модули поведения (`TextureModule`, `SpriteModule`, `MovementModule`, `VisionModule`, `SelectableModule`, `PlayableModules`)
 - Lombok: `@Getter`, `@Setter`, `@AllArgsConstructor`, `@RequiredArgsConstructor`, `@Builder`
@@ -53,7 +52,7 @@ public class MovementModule extends EntityModule {
 
 ## Сохраняй существующие имена (опечатки — часть API)
 
-`Aligment`, `controll`, `drawContur`, `drawRec`, `Woomen`, `isInitilize`, `playerControll`.
+`controll`, `drawContur`, `drawRec`, `Woomen`, `isInitilize`, `playerControll`.
 
 ## Gradle / ассеты
 

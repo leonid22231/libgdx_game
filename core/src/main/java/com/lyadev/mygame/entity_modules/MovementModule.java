@@ -76,10 +76,6 @@ public class MovementModule extends EntityModule {
         isSprinting = false;
     }
 
-    public boolean isMoving() {
-        return moveLeft || moveRight || moveUp || moveDown;
-    }
-
     private SpriteModule getSpriteModule() {
         EntityModule module = getEntity().getModule("sprite_module");
         if(module instanceof SpriteModule){

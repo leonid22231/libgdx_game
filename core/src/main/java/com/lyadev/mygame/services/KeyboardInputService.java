@@ -1,8 +1,5 @@
 package com.lyadev.mygame.services;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
@@ -14,9 +11,6 @@ import com.lyadev.mygame.world.GlobalWorld;
 
 public class KeyboardInputService implements InputProcessor {
     private static final String TAG = "KeyboardInputService";
-
-    Map<Integer, String> currentKeyCodes = new HashMap<Integer, String>();
-    Map<Integer, String> tempKeyCodes = new HashMap<Integer, String>();
 
     public KeyboardInputService() {
         Gdx.app.log(TAG, "Create the KeyboardInputService!");
@@ -111,19 +105,16 @@ public class KeyboardInputService implements InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-
         return true;
     }
 
     @Override
     public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
-
         return true;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-
         return true;
     }
 
@@ -139,5 +130,4 @@ public class KeyboardInputService implements InputProcessor {
         MainService.getInstance().getLogger().setScroll(amountY);
         return true;
     }
-
 }

@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.lyadev.mygame.enums.MoveType;
 import com.lyadev.mygame.services.MainService;
 import com.lyadev.mygame.utils.CircleSector;
-import com.lyadev.mygame.utils.LineFromRect;
 import com.lyadev.mygame.utils.Position;
 import com.lyadev.mygame.utils.listeners.EntityListener;
 import com.lyadev.mygame.utils.listeners.EntityListenerThread;
@@ -32,7 +31,7 @@ public class VisionModule extends EntityModule {
                 .build();
         thread.setEntity(entity);
 
-        EntityListener listener = new EntityListener(entity, thread);
+        EntityListener listener = new EntityListener(thread);
         entity.getStatus().setListener(listener);
         GlobalWorld.listeners.add(listener);
     }
@@ -55,18 +54,10 @@ public class VisionModule extends EntityModule {
         return settings.getVisibleRadius();
     }
 
-    public float getVisionRadiusDegrees() {
-        return VISION_DEGREES;
-    }
-
     public CircleSector getCircleSector() {
         updateVisionDegrees();
         Position center = getEntity().getCenterPosition();
         return new CircleSector(center.getX(), center.getY(), getVisionScore(), currentDegrees1, currentDegrees2);
-    }
-
-    public LineFromRect[] getRectLines() {
-        return getEntity().getVision().getRectLines();
     }
 
     public static VisionModule from(Entity entity) {
@@ -85,8 +76,8 @@ public class VisionModule extends EntityModule {
         }
 
         float deg = VISION_DEGREES / 2;
-        float degrees1;
-        float degrees2;
+        float degrees1 = deg;
+        float degrees2 = deg * -1;
         float round = 180 - deg * 2;
         switch(lastMoveType){
             case DOWN:
@@ -102,10 +93,6 @@ public class VisionModule extends EntityModule {
                 degrees2 = deg + round;
                 break;
             case RIGHT:
-                degrees1 = deg;
-                degrees2 = deg * -1;
-                break;
-            default:
                 degrees1 = deg;
                 degrees2 = deg * -1;
                 break;
