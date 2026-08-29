@@ -1,10 +1,10 @@
 package com.lyadev.mygame.enums;
 
-import com.lyadev.mygame.entities.PlayebleEntity;
+import com.lyadev.mygame.base.Entity;
 
 public enum EntityType {
-    PLAYEBLE(PlayebleEntity.class);
-    private Class<?> refClass;
+    ENTITY(Entity.class);
+    private final Class<?> refClass;
     EntityType(Class<?> refClass) {
         this.refClass = refClass;
     }

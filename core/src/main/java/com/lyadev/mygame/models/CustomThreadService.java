@@ -1,7 +1,5 @@
 package com.lyadev.mygame.models;
 
-import java.util.function.Function;
-
 import com.badlogic.gdx.Gdx;
 
 public class CustomThreadService {

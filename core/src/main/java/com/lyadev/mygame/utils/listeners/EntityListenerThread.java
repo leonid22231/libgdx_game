@@ -6,12 +6,10 @@ import java.util.concurrent.TimeUnit;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.lyadev.mygame.entities.PlayebleEntity;
 import com.lyadev.mygame.enums.EntityType;
 import com.lyadev.mygame.utils.CircleSector;
 import com.lyadev.mygame.utils.LineFromRect;
 import com.lyadev.mygame.utils.Point;
-import com.lyadev.mygame.utils.Position;
 import com.lyadev.mygame.world.GlobalWorld;
 
 import lombok.Builder;
@@ -36,8 +34,6 @@ public class EntityListenerThread extends Thread {
         setName(name);
         start();
     }
-
-    int errorCount = 0;
 
     public void setEntity(Object entity) {
         this.entity = entity;
@@ -66,61 +62,54 @@ public class EntityListenerThread extends Thread {
                     allThreads.add(GlobalWorld.listeners.get(i).thread);
                 }
             }
-            boolean allThreadReady = true;
+            //boolean allThreadReady = true;
             for (EntityListenerThread thread : allThreads) {
                 if (!thread.isInitilize) {
-                    allThreadReady = false;
+                    //allThreadReady = false;
                 }
             }
-            if (entityType == EntityType.PLAYEBLE) {
-                PlayebleEntity entity = (PlayebleEntity) this.entity;
-                lines = entity.getRectLines();
+            // if (entityType == EntityType.PLAYEBLE) {
+            //     PlayebleEntity entity = (PlayebleEntity) this.entity;
+            //     lines = entity.getRectLines();
 
-                Float visionScore = entity.getVisionScore();
-                CircleSector circleSector = entity.getCircleSector();
+            //     Float visionScore = entity.getVisionScore();
+            //     CircleSector circleSector = entity.getCircleSector();
 
-                Position pos = entity.getCenterPosition();
-                isInitilize = true;
-                if(!allThreadReady){
-                    continue;
-                }
-                for (EntityListenerThread thread : allThreads) {
-                    if (thread.isInitilize) {
-                        if (thread.isActive()) {
-                            LineFromRect[] anotherLine = thread.getLines();
-                            if (anotherLine != null) {
-                                boolean isEntityVisible = false;
-                                List<LineFromRect> _lines = new ArrayList<>();
-                                check: for (LineFromRect line : anotherLine) {
-                                    if (inCircle(pos.getX(), pos.getY(), visionScore, line.start,
-                                            line.end, circleSector)) {
-                                        isEntityVisible = true;
-                                        _lines.add(line);
-                                        continue check;
-                                    }
-                                }
-                                LineFromRect[] visibleLines = new LineFromRect[_lines.size()];
-                                for (int i = 0; i < _lines.size(); i++) {
-                                    visibleLines[i] = _lines.get(i);
-                                }
-                                if (isEntityVisible) {
-                                    entity.addVisibleObject(thread.entity, visibleLines);
-                                } else {
-                                    entity.removeVisibleObject(thread.entity);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            //     Position pos = entity.getCenterPosition();
+            //     isInitilize = true;
+            //     if(!allThreadReady){
+            //         continue;
+            //     }
+            //     for (EntityListenerThread thread : allThreads) {
+            //         if (thread.isInitilize) {
+            //             if (thread.isActive()) {
+            //                 LineFromRect[] anotherLine = thread.getLines();
+            //                 if (anotherLine != null) {
+            //                     boolean isEntityVisible = false;
+            //                     List<LineFromRect> _lines = new ArrayList<>();
+            //                     check: for (LineFromRect line : anotherLine) {
+            //                         if (inCircle(pos.getX(), pos.getY(), visionScore, line.start,
+            //                                 line.end, circleSector)) {
+            //                             isEntityVisible = true;
+            //                             _lines.add(line);
+            //                             continue check;
+            //                         }
+            //                     }
+            //                     LineFromRect[] visibleLines = new LineFromRect[_lines.size()];
+            //                     for (int i = 0; i < _lines.size(); i++) {
+            //                         visibleLines[i] = _lines.get(i);
+            //                     }
+            //                     if (isEntityVisible) {
+            //                         entity.addVisibleObject(thread.entity, visibleLines);
+            //                     } else {
+            //                         entity.removeVisibleObject(thread.entity);
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
 
-            if (lines == null && (errorTime == 0 || (TimeUtils.millis() - errorTime) / 100 > 10)) {
-                errorCount++;
-                errorTime = TimeUtils.millis();
-            }
-            if (errorCount > 10) {
-                active = false;
-            }
             try {
                 TimeUnit.MILLISECONDS.sleep(200);
             } catch (InterruptedException e) {

@@ -9,8 +9,8 @@ dependencies {
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
   implementation "org.json:json:20231013"
   
-  compileOnly 'org.projectlombok:lombok:1.18.20'
-  annotationProcessor 'org.projectlombok:lombok:1.18.20'
+  compileOnly 'org.projectlombok:lombok:1.18.38'
+  annotationProcessor 'org.projectlombok:lombok:1.18.38'
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"

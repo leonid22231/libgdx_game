@@ -10,9 +10,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.lyadev.mygame.UI;
 import com.lyadev.mygame.enums.EntityType;
 import com.lyadev.mygame.enums.MoveType;
 import com.lyadev.mygame.models.MoveEventSetting;
@@ -26,32 +24,32 @@ import com.lyadev.mygame.utils.listeners.EntityListenerThread;
 
 public class PlayebleEntity extends Actor {
     private PlayerSettings settings; //DONE
-    private boolean isActive = false;
-    private float positionX = 0;
-    private float positionY = 0;
-    private float speed = 0;
+    private boolean isActive = false; //DONE
+    private float positionX = 0; //DONE
+    private float positionY = 0; //DONE
+    private float speed = 0; // PLAYER_MOVEMENT
     private Boolean isFocused = false; //DONE
     private float height; //DONE
     private float width; //DONE
-    private Boolean moveLeft = false;
-    private Boolean moveRight = false;
-    private Boolean moveUp = false;
-    private Boolean moveDown = false;
+    private Boolean moveLeft = false; // PLAYER_MOVEMENT
+    private Boolean moveRight = false; // PLAYER_MOVEMENT
+    private Boolean moveUp = false; // PLAYER_MOVEMENT
+    private Boolean moveDown = false; // PLAYER_MOVEMENT
     private int regions = 0; //DONE
-    private MoveType lastMoveType = MoveType.DOWN;
-    private Boolean isSprinting = false;
+    private MoveType lastMoveType = MoveType.DOWN; // PLAYER_MOVEMENT
+    private Boolean isSprinting = false; // PLAYER_MOVEMENT
     private int scaleFactor = 4; //DONE
-    private float visionScore = 0; 
+    private float visionScore = 0;  // PLAYER_MOVEMENT
     private boolean showLines = false; 
-    private float mainDegrees = 90; 
+    private float mainDegrees = 90;  // PLAYER_MOVEMENT
     private boolean isVisible = false;
     private boolean drawDebugLines = false;
     private List<Object> visibleObjects = new ArrayList<Object>(); //DONE
     private boolean[] visibleLines = { false, false, false, false }; //DONE
-    private float currentDegrees1 = 0;
-    private float currentDegrees2 = 0;
-    LineFromRect[] linesFromRect = new LineFromRect[4];
-    EntityListener listener;
+    private float currentDegrees1 = 0; // PLAYER_MOVEMENT
+    private float currentDegrees2 = 0; // PLAYER_MOVEMENT
+    LineFromRect[] linesFromRect = new LineFromRect[4]; // DONE
+    EntityListener listener; // DONE
     List<TextureRegion> allTextureRegions = new ArrayList<TextureRegion>(); //DONE
 
     public void drawDebugLinesToggle() {
@@ -115,12 +113,12 @@ public class PlayebleEntity extends Actor {
         if (!objectIsVisible(object)) {
             visibleObjects.add(object);
         }
-        if (object.getClass() == EntityType.PLAYEBLE.getRefClass() && isActive) {
+        if (object.getClass() == EntityType.ENTITY.getRefClass() && isActive) {
             PlayebleEntity playebleEntity = (PlayebleEntity) object;
             playebleEntity.setVisible(true);
         }
 
-        if (object.getClass() == EntityType.PLAYEBLE.getRefClass() && isActive) {
+        if (object.getClass() == EntityType.ENTITY.getRefClass() && isActive) {
             PlayebleEntity playebleEntity = (PlayebleEntity) object;
             playebleEntity.setVisibleLines(visibleLines);
         }
@@ -128,7 +126,7 @@ public class PlayebleEntity extends Actor {
 
     public void removeVisibleObject(Object object) {
         if (objectIsVisible(object)) {
-            if (object.getClass() == EntityType.PLAYEBLE.getRefClass()) {
+            if (object.getClass() == EntityType.ENTITY.getRefClass()) {
                 PlayebleEntity playebleEntity = (PlayebleEntity) object;
                 playebleEntity.setVisible(false);
                 playebleEntity.removeVisibleLine();
@@ -302,8 +300,8 @@ public class PlayebleEntity extends Actor {
         batch.end();
         drawVision();
         if (drawDebugLines) {
-            drawContur();
-            drawArrowFromCenter();
+            //drawContur();
+            //drawArrowFromCenter();
         }
         batch.begin();
     }
@@ -357,16 +355,16 @@ public class PlayebleEntity extends Actor {
         double y = centerPosition.getY() + visionScore * Math.sin(Math.toRadians(degrees1));
         double x1 = centerPosition.getX() + visionScore * Math.cos(Math.toRadians(degrees2));
         double y1 = centerPosition.getY() + visionScore * Math.sin(Math.toRadians(degrees2));
-        float test1 = (float) normalize360(degrees1);
-        float test2 = (float) normalize360(degrees2);
+        // float test1 = (float) normalize360(degrees1);
+        // float test2 = (float) normalize360(degrees2);
 
         currentDegrees1 = degrees1;
         currentDegrees2 = degrees2;
         // currentDegrees1 = (float)Math.toRadians(currentDegrees1);
         // currentDegrees2 = (float)Math.toRadians(currentDegrees2);
         if (drawDebugLines) {
-            drawCircle(visionScore);
-            drawLine((float) x, (float) y, (float) x1, (float) y1);
+            //drawCircle(visionScore);
+            //drawLine((float) x, (float) y, (float) x1, (float) y1);
         }
 
     }
@@ -379,143 +377,143 @@ public class PlayebleEntity extends Actor {
         return angle;
     }
 
-    void drawContur() {
-        UI.shape.begin(ShapeType.Line);
-        Color color;
-        for (int i = 0; i < linesFromRect.length; i++) {
-            color = new Color(0, 1, 0, 1);
-            if (visibleLines[i]) {
-                color = new Color(1, 0, 0, 1);
-            }
-            UI.shape.setColor(color);
-            UI.shape.line(linesFromRect[i].start.x, linesFromRect[i].start.y, linesFromRect[i].end.x,
-                    linesFromRect[i].end.y);
-        }
-        UI.shape.end();
-    }
+    // void drawContur() {
+    //     UI.shape.begin(ShapeType.Line);
+    //     Color color;
+    //     for (int i = 0; i < linesFromRect.length; i++) {
+    //         color = new Color(0, 1, 0, 1);
+    //         if (visibleLines[i]) {
+    //             color = new Color(1, 0, 0, 1);
+    //         }
+    //         UI.shape.setColor(color);
+    //         UI.shape.line(linesFromRect[i].start.x, linesFromRect[i].start.y, linesFromRect[i].end.x,
+    //                 linesFromRect[i].end.y);
+    //     }
+    //     UI.shape.end();
+    // }
 
-    void drawCircle(float radius) {
-        // DRAW CIRCLE
-        UI.shape.begin(ShapeType.Line);
-        UI.shape.setColor(0, 0, 1, 1);
-        UI.shape.circle(getCenterPosition().getX(), getCenterPosition().getY(), radius);
-        UI.shape.end();
+    // void drawCircle(float radius) {
+    //     // DRAW CIRCLE
+    //     UI.shape.begin(ShapeType.Line);
+    //     UI.shape.setColor(0, 0, 1, 1);
+    //     UI.shape.circle(getCenterPosition().getX(), getCenterPosition().getY(), radius);
+    //     UI.shape.end();
 
-        if (showLines) {
-            // SET LINE WIDTH
-            Gdx.gl.glLineWidth(2);
-            // DRAW LINES HORIZONTAL
-            UI.shape.begin(ShapeType.Line);
-            UI.shape.setColor(0, 1, 0, 1);
-            UI.shape.line(getCenterPosition().getX(), getCenterPosition().getY() - radius, getCenterPosition().getX(),
-                    getCenterPosition().getY() + radius);
-            UI.shape.end();
+    //     if (showLines) {
+    //         // SET LINE WIDTH
+    //         Gdx.gl.glLineWidth(2);
+    //         // DRAW LINES HORIZONTAL
+    //         UI.shape.begin(ShapeType.Line);
+    //         UI.shape.setColor(0, 1, 0, 1);
+    //         UI.shape.line(getCenterPosition().getX(), getCenterPosition().getY() - radius, getCenterPosition().getX(),
+    //                 getCenterPosition().getY() + radius);
+    //         UI.shape.end();
 
-            // DRAW LINES VERTICAL
-            UI.shape.begin(ShapeType.Line);
-            UI.shape.setColor(0, 1, 0, 1);
-            UI.shape.line(getCenterPosition().getX() - radius, getCenterPosition().getY(),
-                    getCenterPosition().getX() + radius, getCenterPosition().getY());
-            UI.shape.end();
-            Gdx.gl.glLineWidth(1);
-        }
+    //         // DRAW LINES VERTICAL
+    //         UI.shape.begin(ShapeType.Line);
+    //         UI.shape.setColor(0, 1, 0, 1);
+    //         UI.shape.line(getCenterPosition().getX() - radius, getCenterPosition().getY(),
+    //                 getCenterPosition().getX() + radius, getCenterPosition().getY());
+    //         UI.shape.end();
+    //         Gdx.gl.glLineWidth(1);
+    //     }
 
-    }
+    // }
 
-    void drawArrowFromCenter() {
-        float deg = 0;
-        switch (lastMoveType) {
-            case DOWN:
-                deg = -90;
-                break;
-            case UP:
-                deg = 90;
-                break;
-            case LEFT:
-                deg = 180;
-                break;
-            case RIGHT:
-                deg = 0;
-                break;
-            default:
-                deg = 0;
-                break;
-        }
-        double x = getCenterPosition().getX() + visionScore * Math.cos(Math.toRadians(deg));
-        double y = getCenterPosition().getY() + visionScore * Math.sin(Math.toRadians(deg));
+    // void drawArrowFromCenter() {
+    //     float deg = 0;
+    //     switch (lastMoveType) {
+    //         case DOWN:
+    //             deg = -90;
+    //             break;
+    //         case UP:
+    //             deg = 90;
+    //             break;
+    //         case LEFT:
+    //             deg = 180;
+    //             break;
+    //         case RIGHT:
+    //             deg = 0;
+    //             break;
+    //         default:
+    //             deg = 0;
+    //             break;
+    //     }
+    //     double x = getCenterPosition().getX() + visionScore * Math.cos(Math.toRadians(deg));
+    //     double y = getCenterPosition().getY() + visionScore * Math.sin(Math.toRadians(deg));
 
-        drawSingleLineFromCenter((float) x, (float) y, Color.GREEN);
+    //     drawSingleLineFromCenter((float) x, (float) y, Color.GREEN);
 
-        int rad = 50;
-        float deg1 = 45;
-        float degrees1;
-        float degrees2;
-        float round = 180 - deg * 2;
-        switch (lastMoveType) {
-            case DOWN:
-                degrees1 = (90 - deg1) * -1;
-                degrees2 = (90 + deg1) * -1;
-                degrees1 = 180 + degrees1;
-                degrees2 = 180 + degrees2;
-                break;
-            case UP:
-                degrees1 = (90 + deg1);
-                degrees2 = (90 - deg1);
-                degrees1 = 180 + degrees1;
-                degrees2 = 180 + degrees2;
-                break;
-            case LEFT:
-                degrees1 = (deg1 + round) * -1;
-                degrees2 = (deg1 + round);
-                degrees1 = 180 - degrees1;
-                degrees2 = 180 - degrees2;
-                break;
-            case RIGHT:
-                degrees1 = deg1;
-                degrees2 = deg1 * -1;
-                degrees1 = 180 - degrees1;
-                degrees2 = 180 - degrees2;
-                break;
-            default:
-                degrees1 = deg1;
-                degrees2 = deg1 * -1;
-                break;
-        }
-        double x1 = x + rad * Math.cos(Math.toRadians(degrees1));
-        double y1 = y + rad * Math.sin(Math.toRadians(degrees1));
+    //     int rad = 50;
+    //     float deg1 = 45;
+    //     float degrees1;
+    //     float degrees2;
+    //     float round = 180 - deg * 2;
+    //     switch (lastMoveType) {
+    //         case DOWN:
+    //             degrees1 = (90 - deg1) * -1;
+    //             degrees2 = (90 + deg1) * -1;
+    //             degrees1 = 180 + degrees1;
+    //             degrees2 = 180 + degrees2;
+    //             break;
+    //         case UP:
+    //             degrees1 = (90 + deg1);
+    //             degrees2 = (90 - deg1);
+    //             degrees1 = 180 + degrees1;
+    //             degrees2 = 180 + degrees2;
+    //             break;
+    //         case LEFT:
+    //             degrees1 = (deg1 + round) * -1;
+    //             degrees2 = (deg1 + round);
+    //             degrees1 = 180 - degrees1;
+    //             degrees2 = 180 - degrees2;
+    //             break;
+    //         case RIGHT:
+    //             degrees1 = deg1;
+    //             degrees2 = deg1 * -1;
+    //             degrees1 = 180 - degrees1;
+    //             degrees2 = 180 - degrees2;
+    //             break;
+    //         default:
+    //             degrees1 = deg1;
+    //             degrees2 = deg1 * -1;
+    //             break;
+    //     }
+    //     double x1 = x + rad * Math.cos(Math.toRadians(degrees1));
+    //     double y1 = y + rad * Math.sin(Math.toRadians(degrees1));
 
-        double x2 = x + rad * Math.cos(Math.toRadians(degrees2));
-        double y2 = y + rad * Math.sin(Math.toRadians(degrees2));
+    //     double x2 = x + rad * Math.cos(Math.toRadians(degrees2));
+    //     double y2 = y + rad * Math.sin(Math.toRadians(degrees2));
 
-        UI.shape.begin(ShapeType.Filled);
-        UI.shape.setColor(Color.GREEN);
-        UI.shape.triangle((float) x, (float) y, (float) x1, (float) y1, (float) x2, (float) y2);
-        UI.shape.end();
-    }
+    //     UI.shape.begin(ShapeType.Filled);
+    //     UI.shape.setColor(Color.GREEN);
+    //     UI.shape.triangle((float) x, (float) y, (float) x1, (float) y1, (float) x2, (float) y2);
+    //     UI.shape.end();
+    // }
 
-    void drawSingleLineFromCenter(float x, float y) {
-        UI.shape.begin(ShapeType.Line);
-        UI.shape.setColor(1, 0, 0, 1);
-        UI.shape.line(getCenterPosition().getX(), getCenterPosition().getY(), x, y);
-        UI.shape.end();
-    }
+    // void drawSingleLineFromCenter(float x, float y) {
+    //     UI.shape.begin(ShapeType.Line);
+    //     UI.shape.setColor(1, 0, 0, 1);
+    //     UI.shape.line(getCenterPosition().getX(), getCenterPosition().getY(), x, y);
+    //     UI.shape.end();
+    // }
 
-    void drawSingleLineFromCenter(float x, float y, Color color) {
-        Gdx.gl.glLineWidth(2);
-        UI.shape.begin(ShapeType.Line);
-        UI.shape.setColor(color);
-        UI.shape.line(getCenterPosition().getX(), getCenterPosition().getY(), x, y);
-        UI.shape.end();
-        Gdx.gl.glLineWidth(1);
-    }
+    // void drawSingleLineFromCenter(float x, float y, Color color) {
+    //     Gdx.gl.glLineWidth(2);
+    //     UI.shape.begin(ShapeType.Line);
+    //     UI.shape.setColor(color);
+    //     UI.shape.line(getCenterPosition().getX(), getCenterPosition().getY(), x, y);
+    //     UI.shape.end();
+    //     Gdx.gl.glLineWidth(1);
+    // }
 
-    void drawLine(float x, float y, float x1, float y1) {
-        UI.shape.begin(ShapeType.Line);
-        UI.shape.setColor(1, 0, 0, 1);
-        UI.shape.line(getCenterPosition().getX(), getCenterPosition().getY(), x, y);
-        UI.shape.line(getCenterPosition().getX(), getCenterPosition().getY(), x1, y1);
-        UI.shape.end();
-    }
+    // void drawLine(float x, float y, float x1, float y1) {
+    //     UI.shape.begin(ShapeType.Line);
+    //     UI.shape.setColor(1, 0, 0, 1);
+    //     UI.shape.line(getCenterPosition().getX(), getCenterPosition().getY(), x, y);
+    //     UI.shape.line(getCenterPosition().getX(), getCenterPosition().getY(), x1, y1);
+    //     UI.shape.end();
+    // }
 
     void move() {
         if (isSprinting) {

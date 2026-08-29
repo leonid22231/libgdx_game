@@ -11,16 +11,15 @@ import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.lyadev.mygame.UI;
 import com.lyadev.mygame.base.Entity;
-import com.lyadev.mygame.entities.PlayebleEntity;
+import com.lyadev.mygame.services.MainService;
 import com.lyadev.mygame.utils.ViewPosition;
 import com.lyadev.mygame.utils.listeners.EntityListenerThread;
 import com.lyadev.mygame.views.Views;
 import com.lyadev.mygame.world.GlobalWorld;
 
 public class MyLogger implements ApplicationLogger {
-    List<Message> messages = new ArrayList<Message>();
+    final List<Message> messages = new ArrayList<>();
     final String VERSION = "1.0";
     Boolean active = true;
     Boolean isFocused = false;
@@ -29,7 +28,7 @@ public class MyLogger implements ApplicationLogger {
     float scrollOffset = 0;
     float mousePositionX = 0;
     float mousePositionY = 0;
-    List<String> lastKeys = new ArrayList<String>();
+    List<String> lastKeys = new ArrayList<>();
     float lastScroll = 0;
     int lastTapScreenX; 
     int lastTapScreenY; 
@@ -50,11 +49,7 @@ public class MyLogger implements ApplicationLogger {
     public void mousePositionListener(float x, float y){
         mousePositionX = x;
         mousePositionY = y;
-        if(mousePositionY < Gdx.graphics.getHeight() && mousePositionY > 0 && mousePositionX < width && mousePositionX > 0){
-            isFocused = true;
-        }else{
-            isFocused = false;
-        }
+        isFocused = mousePositionY < Gdx.graphics.getHeight() && mousePositionY > 0 && mousePositionX < width && mousePositionX > 0;
     }
     Boolean mouseInBox(){
 
@@ -166,7 +161,7 @@ public class MyLogger implements ApplicationLogger {
 
 class ColumnText {
     String[] strings;
-    List<Message> messages = new ArrayList<Message>();
+    List<Message> messages = new ArrayList<>();
     float width = 0;
     float height = 0;
     float scrollOffset = 0;
@@ -182,8 +177,8 @@ class ColumnText {
     public void draw() {
         String ender = "____________________________";
         float displayHeight = Gdx.graphics.getHeight();
-        List<Float> sizes = new ArrayList<Float>();
-        List<Float> positions = new ArrayList<Float>();
+        List<Float> sizes = new ArrayList<>();
+        List<Float> positions = new ArrayList<>();
         float maxWidth = 0;
         float enderHeight = 0;
         for (String topText : strings) {
@@ -213,7 +208,7 @@ class ColumnText {
                 positions.add(calculatedY);
             }
         }
-        List<Float> sizedBottom = new ArrayList<Float>();
+        List<Float> sizedBottom = new ArrayList<>();
         List<Float> bottomPositions = new ArrayList<>();
 
         for(Message bottomTest : messages){
@@ -248,7 +243,7 @@ class ColumnText {
         }
         drawRect(y, maxWidth,
                 rectHeight);
-        UI.font.setColor(Color.RED);
+        MainService.getInstance().getFont().setColor(Color.RED);
         for (int i = 0; i < strings.length; i++) {
             Views.drawText(strings[i], new ViewPosition(10, positions.get(i)));
         }
@@ -257,26 +252,25 @@ class ColumnText {
         }
         
         for (int i = 0; i < messages.size(); i++) {
-            UI.font.setColor(messages.get(i).level.getColor());
+            MainService.getInstance().getFont().setColor(messages.get(i).level.getColor());
             Views.drawText(messages.get(i).toString(), new ViewPosition(10, bottomPositions.get(i)));
         }
 
-        UI.font.setColor(Color.WHITE);
+        MainService.getInstance().getFont().setColor(Color.WHITE);
         width = maxWidth + 20;
         height = rectHeight;
     }
 
     void drawRect(float y, float width, float height) {
-        Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL30.GL_BLEND);
         Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
-        UI.batch.end();
-        UI.shape.begin(ShapeType.Line);
-        UI.shape.setColor(new Color(Color.BLUE.r, Color.BLUE.g, Color.BLUE.b, 0f));
-        UI.shape.rect(0, y, width + 20, height + 10);
-        UI.shape.end();
+        MainService.getInstance().getSpriteBatch().end();
+        MainService.getInstance().getShapeRenderer().begin(ShapeType.Line);
+        MainService.getInstance().getShapeRenderer().setColor(new Color(Color.BLUE.r, Color.BLUE.g, Color.BLUE.b, 0f));
+        MainService.getInstance().getShapeRenderer().rect(0, y, width + 20, height + 10);
+        MainService.getInstance().getShapeRenderer().end();
         Gdx.gl.glDisable(GL30.GL_BLEND);
-        UI.batch.begin();
+        MainService.getInstance().getSpriteBatch().begin();
     }
 }
 class Message{
@@ -297,7 +291,7 @@ enum MessageLevel{
     LOG(Color.GREEN),
     ERROR(Color.RED),
     DEBUG(Color.CYAN);
-    private Color color;
+    private final Color color;
 
     public Color getColor(){
         return color;

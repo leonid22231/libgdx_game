@@ -2,17 +2,12 @@ package com.lyadev.mygame.services;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
-import com.lyadev.mygame.UI;
-import com.lyadev.mygame.entities.PlayebleEntity;
 import com.lyadev.mygame.models.CustomThreadService;
 import com.lyadev.mygame.world.GlobalWorld;
 
@@ -33,9 +28,8 @@ public class KeyboardInputService implements InputProcessor {
         thread.interrupt();
     }
 
-    void init() {
+    final void init() {
         Gdx.app.log(TAG, "Initialize the KeyboardInputService!");
-
     }
 
     void playerControll(int keycode) {
@@ -64,7 +58,7 @@ public class KeyboardInputService implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        UI.logger.addKey(Keys.toString(keycode));
+        MainService.getInstance().getLogger().addKey(Keys.toString(keycode));
         playerControll(keycode);
         return true;
     }
@@ -80,13 +74,13 @@ public class KeyboardInputService implements InputProcessor {
                 //GlobalEntity.setAllRandomPositions();
                 break;
             case Keys.R:
-                UI.logger.clearLogs();
+                 MainService.getInstance().getLogger().clearLogs();
                 break;
             case Keys.ALT_RIGHT:
                 //GlobalEntity.drawDebugLineToggle();
                 break;
             case Keys.ALT_LEFT:
-                UI.logger.setActive(!UI.logger.getActive());
+                 MainService.getInstance().getLogger().setActive(! MainService.getInstance().getLogger().getActive());
                 break;
             default:
                 break;
@@ -102,7 +96,7 @@ public class KeyboardInputService implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        UI.logger.setLastTap(screenX, screenY, pointer, button);
+         MainService.getInstance().getLogger().setLastTap(screenX, screenY, pointer, button);
         //TODO: Implement entity click event
         //GlobalEntity.clickEvent();
         return true;
@@ -128,7 +122,7 @@ public class KeyboardInputService implements InputProcessor {
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        UI.logger.mousePositionListener(screenX, screenY);
+         MainService.getInstance().getLogger().mousePositionListener(screenX, screenY);
         //TODO: Implement entity movement logic
         //GlobalEntity.updateEntityInfo(screenX, screenY);
         return true;
@@ -136,7 +130,7 @@ public class KeyboardInputService implements InputProcessor {
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
-        UI.logger.setScroll(amountY);
+         MainService.getInstance().getLogger().setScroll(amountY);
         return true;
     }
 

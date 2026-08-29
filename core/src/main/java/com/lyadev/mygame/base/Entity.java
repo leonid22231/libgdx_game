@@ -1,5 +1,6 @@
 package com.lyadev.mygame.base;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
@@ -21,10 +22,12 @@ import lombok.Setter;
 public class Entity extends Actor {
     private EntitySettings settings;
     private EntityTexture texture = new EntityTexture();
-    private Position position = Position.DEFAULT;
+    private EntityPosition position = EntityPosition.DEFAULT;
     private EntityStatus status = new EntityStatus();
+    private EntityVision vision = new EntityVision();
     private Size size;
     private String TAG;
+    private ArrayList<EntityModule> modules = new ArrayList<>();
 
     public Entity(EntitySettings settings) {
         this.settings = settings;
@@ -33,15 +36,26 @@ public class Entity extends Actor {
         setupSize(texture.getTextureSize());
         initThread();
         GlobalWorld.addEntity(this);
+        vision.init(this);
         status.setIsInit(true);
     }
 
+
+    @Override
+    public void act(float delta) {
+        vision.update();
+    }
     // NOTE: DRAWING METHODS
     @Override
     public void draw(Batch batch, float parentAlpha) {
         batch.draw(texture.getCurrentTexture(), position.getX(), position.getY(), size.getWidth(), size.getHeight());
+        debugDraw(batch);
     }
-    
+    private void debugDraw(Batch batch) {
+        batch.end();
+        vision.draw();
+        batch.begin();
+    }
     // NOTE: GLOBAL METHODS
     public void setRandomPositionInScreen() {
         Random random = new Random();
@@ -74,6 +88,9 @@ public class Entity extends Actor {
        TAG = String.format("Player[%s]", settings.getTag());
     }
     // NOTE: Custom GETTERS
+    public Position getCenterPosition() {
+        return position.getCenterPositionFromSize(size);
+    }
     public Size getSize() {
         if (size == null)
             return Size.ENTITY_DEFAULT;
@@ -81,11 +98,15 @@ public class Entity extends Actor {
         return size;
     }
 
+    //NOTE: Modules
+    public void addModule(EntityModule module){
+        modules.add(module);
+    }
     // NOTE: Dispose method
     public void dispose() {
         status.getListener().dispose();
     }
-
+        
     // NOTE: toString
     @Override
     public String toString() {
@@ -93,6 +114,6 @@ public class Entity extends Actor {
                 "%s x[%.3f], y[%.3f], h[%s], w[%s], active[%s], focused[%s], sprite[%s], visibleObjects[%s]",
                 TAG, position.getX(),
                 position.getY(), size.getHeight(), size.getWidth(), status.isActive(), status.getIsFocused(),
-                texture.getCurrentSpriteIndex(), status.getVisibleObjects().size());
+                texture.getCurrentSpriteIndex(), vision.getVisibleObjects().size());
     }
 }

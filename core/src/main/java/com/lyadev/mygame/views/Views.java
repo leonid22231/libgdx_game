@@ -2,13 +2,13 @@ package com.lyadev.mygame.views;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.lyadev.mygame.UI;
+import com.lyadev.mygame.services.MainService;
 import com.lyadev.mygame.utils.ViewPosition;
 
 public class Views {
     public static GlyphLayout preDrawText(String text) {
         GlyphLayout layout = new GlyphLayout();
-        layout.setText(UI.font, text);
+        layout.setText(MainService.getInstance().getFont(), text);
         return layout;
     }
 
@@ -19,7 +19,7 @@ public class Views {
         float x;
         float y;
         GlyphLayout layout = new GlyphLayout();
-        layout.setText(UI.font, text);
+        layout.setText(MainService.getInstance().getFont(), text);
         if (position.getAligment() != null) {
             switch (position.getAligment()) {
                 case TOP_LEFT:
@@ -60,6 +60,6 @@ public class Views {
             y = position.getY();
         }
         
-        return UI.font.draw(UI.batch, text, x, y);
+        return MainService.getInstance().getFont().draw(MainService.getInstance().getSpriteBatch(), text, x, y);
     }
 }

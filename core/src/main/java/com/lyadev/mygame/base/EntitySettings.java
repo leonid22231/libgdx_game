@@ -13,4 +13,5 @@ public class EntitySettings {
     private String tag;
     private String texture;
     private Size textureSize;
+    private int textureScaleFactor = 1;
 }

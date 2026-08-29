@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PlayerSettings extends EntitySettings{
-    public PlayerSettings(String tag, String texture, Size textureSize) {
-        super(tag, texture, textureSize);
+    public PlayerSettings(String tag, String texture, Size textureSize, int textureScaleFactor) {
+        super(tag, texture, textureSize, textureScaleFactor);
     }
 }

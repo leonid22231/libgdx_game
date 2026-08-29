@@ -1,0 +1,44 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "libgdx: sync launch resources",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "$out = Join-Path '${workspaceFolder}' 'lwjgl3/bin/main'; $src = Join-Path '${workspaceFolder}' 'lwjgl3/src/main/resources'; New-Item -ItemType Directory -Path $out -Force | Out-Null; Copy-Item -Path (Join-Path $src '*.png') -Destination $out -Force"
+      ],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "libgdx: gradle run (debug)",
+      "type": "shell",
+      "command": "${workspaceFolder}/gradlew.bat",
+      "args": [
+        "lwjgl3:run",
+        "--debug-jvm"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "JAVA_HOME": "C:\\Users\\Administrator\\.gradle\\jdks\\eclipse_adoptium-17-amd64-windows\\jdk-17.0.16+8"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "java",
+        "pattern": {
+          "regexp": "^.*$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "Listening for transport dt_socket at address: 5005"
+        }
+      }
+    }
+  ]
+}

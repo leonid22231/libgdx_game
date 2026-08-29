@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Start game",
+      "request": "launch",
+      "mainClass": "com.lyadev.mygame.lwjgl3.Lwjgl3Launcher",
+      "projectName": "MyGameProject-lwjgl3",
+      "cwd": "${workspaceFolder}/assets",
+      "preLaunchTask": "libgdx: sync launch resources"
+    },
+    {
+      "type": "java",
+      "name": "Attach to Gradle (LibGDX)",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": 5005,
+      "projectName": "MyGameProject-lwjgl3",
+      "preLaunchTask": "libgdx: gradle run (debug)"
+    },
+    {
+      "type": "java",
+      "name": "Current File",
+      "request": "launch",
+      "mainClass": "${file}"
+    }
+  ]
+}
