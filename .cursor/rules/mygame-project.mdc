@@ -1,0 +1,65 @@
+---
+description: LibGDX MyGame — архитектура, слои кода и LibGDX-паттерны проекта
+alwaysApply: true
+---
+
+# MyGame (LibGDX) — архитектура
+
+Проект: Java 11, LibGDX 1.13, Gradle multi-module (`core`, `lwjgl3`, `android`).
+Пакет: `com.lyadev.mygame.*`.
+
+## Два слоя кода (рефакторинг в процессе)
+
+**Новый слой** — расширяй его, не legacy:
+- `base/` — `Entity`, `EntitySettings`, `EntityVision`, `EntityModule`
+- `player/` — `Player extends Entity`
+- `world/` — `GlobalWorld` (статические списки и `player`)
+- `entity_modules/` — модули поведения (`MovedModule`)
+- Lombok: `@Getter`, `@Setter`, `@AllArgsConstructor`, `@RequiredArgsConstructor`, `@Builder`
+
+**Legacy** — не копируй в новый код, но не переименовыв без запроса:
+- `PlayebleEntity`, `GlobalEntity_OLD`, `models.PlayerSettings`
+
+## Singleton и глобальное состояние
+
+- Сервисы: lazy singleton через `getInstance()` (`MainService`)
+- Мир: статические поля/методы в `GlobalWorld`
+- Настройки: статический `SettingsService.init()`
+- Константы путей: `Assets` (только `public static final String`)
+
+## LibGDX lifecycle
+
+```java
+// Main.java — только делегирование
+create()  → MainService.getInstance().init()
+render()  → MainService.getInstance().render()
+dispose() → MainService.getInstance().dispose()
+```
+
+## Scene2D и рендер
+
+- Игровые объекты: `extends Actor` (`Entity`, `Place`)
+- Мир добавляет акторов: `stage.addActor(entity)` в `GlobalWorld.init`
+- Цикл: `stage.act(delta)` → `stage.draw()`
+- ShapeRenderer между batch: `batch.end()` → shape → `batch.begin()`
+- Рендер-сервисы берут ресурсы через `MainService.getInstance()`
+
+## Модули сущностей
+
+```java
+public class MovedModule extends EntityModule {
+    @Override
+    public String getName() { return "moved_module"; } // snake_case
+}
+// Entity: modules.add(new MovedModule())
+```
+
+## Сохраняй существующие имена (опечатки — часть API)
+
+`PlayebleEntity`, `Aligment`, `controll`, `drawContur`, `drawRec`, `Woomen`, `isInitilize`, `playerControll`, `moved_module`.
+
+## Gradle / ассеты
+
+- Игровые ассеты: `assets/`, пути в `Assets.java`
+- Desktop run: `workingDir = assets`, launcher — `Lwjgl3Launcher`
+- Иконки окна: `lwjgl3/src/main/resources/libgdx*.png`

@@ -1,0 +1,101 @@
+---
+description: Java code style для MyGame — форматирование, именование, комментарии
+globs: "**/*.java"
+alwaysApply: false
+---
+
+# MyGame — Java code style
+
+Следуй `.editorconfig`: 4 пробела, LF, UTF-8, без trailing whitespace.
+
+## Именование
+
+| Элемент | Стиль | Пример |
+|---------|-------|--------|
+| Классы | PascalCase | `EntityVision`, `MainService` |
+| Пакеты | lowercase, snake для модулей | `entity_modules`, `utils.listeners` |
+| Методы | camelCase, глагол | `init()`, `setRandomPositionInScreen()` |
+| Toggle | `*Toggle()` | `moveLeftToggle()`, `sprintToggle()` |
+| Enum values | SCREAMING_SNAKE | `MOVE_LEFT`, `TOP_CENTER` |
+| Константы | SCREAMING_SNAKE | `Assets.PERSON_MAN`, `Size.ENTITY_DEFAULT` |
+| TAG | `private static final String TAG` или `private final String TAG` | `"KeyboardInputService"` |
+| Boolean-поля | `is*` / `getIs*` | `isActive`, `Boolean isFocused` (legacy) |
+
+## Импорты
+
+1. `java.*`
+2. `com.badlogic.gdx.*` / third-party
+3. `com.lyadev.mygame.*`
+
+Без wildcard-импортов. Между группами — пустая строка.
+
+## Фигурные скобки и пробелы
+
+K&R, допускается без пробела перед `{` (как в проекте):
+
+```java
+public class Entity extends Actor {
+public class Place extends Actor{
+    if(!allEntityInit){
+    if (entity == null) {
+```
+
+Не «причёсывай» форматирование в нетронутых файлах — только в изменённых строках.
+
+## Lombok (новый слой)
+
+```java
+@Getter @Setter
+@AllArgsConstructor
+public class EntitySettings { ... }
+
+@Getter @Setter
+@RequiredArgsConstructor
+public class EntityStatus { ... }
+```
+
+Не добавляй Lombok в legacy-классы (`PlayebleEntity`, services) без явной миграции.
+
+## Комментарии
+
+Секции в `Entity`-подобных классах:
+
+```java
+// NOTE: DRAWING METHODS
+// NOTE: GLOBAL METHODS
+// NOTE: LOGIC METHODS (PRIVATE METHODS)
+// NOTE: Custom GETTERS
+```
+
+TODO: `// TODO: описание` или `//TODO: описание`.
+Legacy-метки: `//DONE`, `// PLAYER_MOVEMENT`.
+Закомментированный старый код (`//GlobalEntity...`) — не удаляй при мелких правках.
+
+## Структура класса Entity
+
+```java
+// поля → конструктор → act/draw → public методы → private методы → dispose → toString
+@Override
+public String toString() {
+    return String.format("%s x[%.3f], y[%.3f], ...", TAG, ...);
+}
+```
+
+## Обработка ошибок
+
+- `Gdx.app.log(TAG, ...)` / `Gdx.app.error(TAG, ...)`
+- `throw new IllegalStateException(...)` для неверного состояния
+- `Thread.currentThread().interrupt()` в catch `InterruptedException`
+- Без пустых catch и без custom exception-классов
+
+## Новый код — куда класть
+
+| Что | Куда |
+|-----|------|
+| Базовая логика сущностей | `base/` |
+| Поведение-модуль | `entity_modules/` |
+| Сервисы (input, render) | `services/` |
+| Утилиты | `utils/` |
+| Enum | `enums/` |
+| DTO/настройки (legacy) | `models/` |
+| Пути к ассетам | `Assets.java` |
