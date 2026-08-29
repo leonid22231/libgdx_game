@@ -22,38 +22,32 @@ public class EntityTexture {
     private List<TextureRegion> allTextureRegions = new ArrayList<>();
 
     public void init(EntitySettings settings) {
-        int height = settings.getTextureSize().getHeight();
-        int width = settings.getTextureSize().getWidth();
-
+        int frameWidth = settings.getTextureSize().getWidth();
+        int frameHeight = settings.getTextureSize().getHeight();
         String textureString = settings.getTexture();
 
         Texture texture = new Texture(textureString);
+        TextureRegion sheetRegion = new TextureRegion(texture);
+        regionsCount = sheetRegion.getRegionWidth() / frameWidth;
 
-        TextureRegion textureRegion = new TextureRegion(texture);
-
-        regionsCount = textureRegion.getRegionWidth() / width;
-        int minNullSectors = height;
-        for (int i = 0; i < regionsCount; i++) {
-
-            textureRegion = new TextureRegion(texture);
-
-            textureRegion.setRegion(i * width, 0, width, height);
-
-            int nullSectors = calculateNullSectors(textureRegion);
-            if(minNullSectors > nullSectors){
-                minNullSectors = nullSectors;
-            }
-            int textureHeight = height - nullSectors;
-
-            textureRegion.setRegion(i * width, nullSectors, width, textureHeight);
-
-            allTextureRegions.add(textureRegion);
-
-            if(textureSize.getHeight()>textureHeight){
-                textureSize.setHeight(textureHeight);
-            }
+        if(!texture.getTextureData().isPrepared()){
+            texture.getTextureData().prepare();
         }
-        Size minSizeFromTexture = new Size(width, height - minNullSectors);
+        Pixmap pixmap = texture.getTextureData().consumePixmap();
+
+        int minTopOffset = frameHeight;
+        for(int i = 0; i < regionsCount; i++){
+            int topOffset = calculateTopTransparentRows(pixmap, i * frameWidth, frameWidth, frameHeight);
+            if(topOffset < minTopOffset){
+                minTopOffset = topOffset;
+            }
+            int croppedHeight = frameHeight - topOffset;
+            TextureRegion frameRegion = new TextureRegion(texture);
+            frameRegion.setRegion(i * frameWidth, topOffset, frameWidth, croppedHeight);
+            allTextureRegions.add(frameRegion);
+        }
+
+        Size minSizeFromTexture = new Size(frameWidth, frameHeight - minTopOffset);
         textureSize = minSizeFromTexture.getSizeFromScaleFactor(settings.getTextureScaleFactor());
     }
 
@@ -61,34 +55,23 @@ public class EntityTexture {
         return allTextureRegions.get(currentSpriteIndex);
     }
 
-    private int calculateNullSectors(TextureRegion textureRegion){
-
-        int width = textureRegion.getRegionWidth();
-        int height = textureRegion.getRegionHeight();
-
-        Texture texture = textureRegion.getTexture();
-
-        if(!texture.getTextureData().isPrepared()){
-            texture.getTextureData().prepare();
-        }
+    private int calculateTopTransparentRows(Pixmap pixmap, int regionX, int regionWidth, int regionHeight) {
         Color colorNull = new Color(0, 0, 0, 0);
-        
-        Pixmap pixmap = texture.getTextureData().consumePixmap();
+        int minTop = regionHeight;
 
-        int minNullSectors = height;
-
-        check:for(int i = 0; i < width; i++){
-            for(int j = 0;j< height;j++){
-                if(!getColorAsPixmap(pixmap, i, j).equals(colorNull)){
-                    if(minNullSectors > j){
-                        minNullSectors = height - j;
-                        continue check;
+        column:for(int x = 0; x < regionWidth; x++){
+            for(int y = 0; y < regionHeight; y++){
+                if(!getColorAsPixmap(pixmap, regionX + x, y).equals(colorNull)){
+                    if(minTop > y){
+                        minTop = y;
+                        continue column;
                     }
                 }
             }
         }
-        return height - minNullSectors;
+        return minTop;
     }
+
     private Color getColorAsPixmap(Pixmap pixmap, int x, int y) {
         return new Color(pixmap.getPixel(x, y));
     }

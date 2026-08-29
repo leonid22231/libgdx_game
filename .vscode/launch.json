@@ -8,6 +8,7 @@
       "mainClass": "com.lyadev.mygame.lwjgl3.Lwjgl3Launcher",
       "projectName": "MyGameProject-lwjgl3",
       "cwd": "${workspaceFolder}/assets",
+      "console": "integratedTerminal",
       "preLaunchTask": "libgdx: sync launch resources"
     },
     {

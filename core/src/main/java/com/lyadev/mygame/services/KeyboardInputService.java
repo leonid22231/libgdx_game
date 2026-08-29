@@ -1,14 +1,15 @@
 package com.lyadev.mygame.services;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
-import com.lyadev.mygame.models.CustomThreadService;
+import com.lyadev.mygame.base.Entity;
+import com.lyadev.mygame.base.EntityModule;
+import com.lyadev.mygame.debug.DebugFeatures;
+import com.lyadev.mygame.entity_modules.MovementModule;
 import com.lyadev.mygame.world.GlobalWorld;
 
 public class KeyboardInputService implements InputProcessor {
@@ -17,43 +18,48 @@ public class KeyboardInputService implements InputProcessor {
     Map<Integer, String> currentKeyCodes = new HashMap<Integer, String>();
     Map<Integer, String> tempKeyCodes = new HashMap<Integer, String>();
 
-    List<CustomThreadService> threads = new ArrayList<CustomThreadService>();
-
     public KeyboardInputService() {
         Gdx.app.log(TAG, "Create the KeyboardInputService!");
-        init();
-    }
-
-    void stopThread(Thread thread) {
-        thread.interrupt();
-    }
-
-    final void init() {
-        Gdx.app.log(TAG, "Initialize the KeyboardInputService!");
     }
 
     void playerControll(int keycode) {
-        if (GlobalWorld.player != null) {
-            switch (keycode) {
-                case Keys.W:
-                    //GlobalEntity.getPlayer().moveUpToggle();
-                    break;
-                case Keys.S:
-                    //GlobalEntity.getPlayer().moveDownToggle();
-                    break;
-                case Keys.A:
-                    //GlobalEntity.getPlayer().moveLeftToggle();
-                    break;
-                case Keys.D:
-                    //GlobalEntity.getPlayer().moveRightToggle();
-                    break;
-                case Keys.SHIFT_LEFT:
-                    //GlobalEntity.getPlayer().sprintToggle();
-                    break;
-                default:
-                    break;
-            }
+        if (GlobalWorld.player == null) {
+            return;
         }
+        MovementModule movement = getMovementModule(GlobalWorld.player);
+        if (movement == null) {
+            return;
+        }
+        if (!GlobalWorld.player.getStatus().isActive()) {
+            return;
+        }
+        switch (keycode) {
+            case Keys.W:
+                movement.moveUpToggle();
+                break;
+            case Keys.S:
+                movement.moveDownToggle();
+                break;
+            case Keys.A:
+                movement.moveLeftToggle();
+                break;
+            case Keys.D:
+                movement.moveRightToggle();
+                break;
+            case Keys.SHIFT_LEFT:
+                movement.sprintToggle();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private MovementModule getMovementModule(Entity entity) {
+        EntityModule module = entity.getModule("movement_module");
+        if (module instanceof MovementModule) {
+            return (MovementModule) module;
+        }
+        return null;
     }
 
     @Override
@@ -71,16 +77,18 @@ public class KeyboardInputService implements InputProcessor {
                 Gdx.app.exit();
                 break;
             case Keys.E:
-                //GlobalEntity.setAllRandomPositions();
+                GlobalWorld.setAllRandomPositions();
                 break;
             case Keys.R:
-                 MainService.getInstance().getLogger().clearLogs();
+                MainService.getInstance().getLogger().clearLogs();
                 break;
             case Keys.ALT_RIGHT:
-                //GlobalEntity.drawDebugLineToggle();
+                DebugFeatures.toggleVisionLines();
+                Gdx.app.debug(TAG, "Vision lines: " + (DebugFeatures.isVisionLinesVisible() ? "ON" : "OFF"));
                 break;
             case Keys.ALT_LEFT:
-                 MainService.getInstance().getLogger().setActive(! MainService.getInstance().getLogger().getActive());
+                DebugFeatures.toggleOverlay();
+                Gdx.app.debug(TAG, "In-game overlay: " + (DebugFeatures.isOverlayVisible() ? "ON" : "OFF"));
                 break;
             default:
                 break;
@@ -96,9 +104,8 @@ public class KeyboardInputService implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-         MainService.getInstance().getLogger().setLastTap(screenX, screenY, pointer, button);
-        //TODO: Implement entity click event
-        //GlobalEntity.clickEvent();
+        MainService.getInstance().getLogger().setLastTap(screenX, screenY, pointer, button);
+        GlobalWorld.handleEntityClick();
         return true;
     }
 
@@ -122,15 +129,14 @@ public class KeyboardInputService implements InputProcessor {
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-         MainService.getInstance().getLogger().mousePositionListener(screenX, screenY);
-        //TODO: Implement entity movement logic
-        //GlobalEntity.updateEntityInfo(screenX, screenY);
+        MainService.getInstance().getLogger().mousePositionListener(screenX, screenY);
+        GlobalWorld.updateEntityMouseInfo(screenX, screenY);
         return true;
     }
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
-         MainService.getInstance().getLogger().setScroll(amountY);
+        MainService.getInstance().getLogger().setScroll(amountY);
         return true;
     }
 

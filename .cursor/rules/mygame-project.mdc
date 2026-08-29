@@ -8,17 +8,13 @@ alwaysApply: true
 Проект: Java 11, LibGDX 1.13, Gradle multi-module (`core`, `lwjgl3`, `android`).
 Пакет: `com.lyadev.mygame.*`.
 
-## Два слоя кода (рефакторинг в процессе)
+## Слои кода
 
-**Новый слой** — расширяй его, не legacy:
-- `base/` — `Entity`, `EntitySettings`, `EntityVision`, `EntityModule`
-- `player/` — `Player extends Entity`
+- `base/` — `Entity`, `EntitySettings`, `PlayableEntitySettings`, `EntityVision`, `EntityModule`
+- `player/` — `Player extends Entity` (опциональная обёртка над `PlayableModules`)
 - `world/` — `GlobalWorld` (статические списки и `player`)
-- `entity_modules/` — модули поведения (`MovedModule`)
+- `entity_modules/` — модули поведения (`TextureModule`, `SpriteModule`, `MovementModule`, `VisionModule`, `SelectableModule`, `PlayableModules`)
 - Lombok: `@Getter`, `@Setter`, `@AllArgsConstructor`, `@RequiredArgsConstructor`, `@Builder`
-
-**Legacy** — не копируй в новый код, но не переименовыв без запроса:
-- `PlayebleEntity`, `GlobalEntity_OLD`, `models.PlayerSettings`
 
 ## Singleton и глобальное состояние
 
@@ -43,20 +39,21 @@ dispose() → MainService.getInstance().dispose()
 - Цикл: `stage.act(delta)` → `stage.draw()`
 - ShapeRenderer между batch: `batch.end()` → shape → `batch.begin()`
 - Рендер-сервисы берут ресурсы через `MainService.getInstance()`
+- Текстуры загружать один раз в `init()`, освобождать в `dispose()`
 
 ## Модули сущностей
 
 ```java
-public class MovedModule extends EntityModule {
+public class MovementModule extends EntityModule {
     @Override
-    public String getName() { return "moved_module"; } // snake_case
+    public String getName() { return "movement_module"; } // snake_case
 }
-// Entity: modules.add(new MovedModule())
+// Entity: PlayableModules.register(entity) или addModule(new MovementModule())
 ```
 
 ## Сохраняй существующие имена (опечатки — часть API)
 
-`PlayebleEntity`, `Aligment`, `controll`, `drawContur`, `drawRec`, `Woomen`, `isInitilize`, `playerControll`, `moved_module`.
+`Aligment`, `controll`, `drawContur`, `drawRec`, `Woomen`, `isInitilize`, `playerControll`.
 
 ## Gradle / ассеты
 

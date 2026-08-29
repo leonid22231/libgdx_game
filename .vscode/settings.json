@@ -1,6 +1,7 @@
 {
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.import.gradle.java.home": "C:\\Users\\Administrator\\.gradle\\jdks\\eclipse_adoptium-17-amd64-windows\\jdk-17.0.16+8",
+  "java.debug.settings.console": "integratedTerminal",
   "java.configuration.runtimes": [
     {
       "name": "JavaSE-17",

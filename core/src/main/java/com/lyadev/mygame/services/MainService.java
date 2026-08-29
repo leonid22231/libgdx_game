@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.lyadev.mygame.debug.DebugFeatures;
 import com.lyadev.mygame.MyLogger.MyLogger;
 import com.lyadev.mygame.world.GlobalWorld;
 
@@ -21,6 +22,7 @@ public class MainService {
     private MyLogger logger;
     private Stage stage;
     private KeyboardInputService keyboardInputService;
+    private Texture backgroundTexture;
 
     public static synchronized MainService getInstance() {
         if (instance == null) {
@@ -37,20 +39,14 @@ public class MainService {
         font = new BitmapFont();
         shape = new ShapeRenderer();
         stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
-        GlobalWorld.init(stage);
         logger = new MyLogger();
-        keyboardInputService = new KeyboardInputService();
-        setup();
-        isInit = true;
-    }
-
-    private void setup() {
-        if (isInit) {
-            return;
-        }
         Gdx.app.setApplicationLogger(logger);
-        Gdx.input.setInputProcessor(stage);
+        Gdx.app.log("MainService", "Application logger initialized");
+        GlobalWorld.init(stage);
+        keyboardInputService = new KeyboardInputService();
         Gdx.input.setInputProcessor(keyboardInputService);
+        backgroundTexture = new Texture("background.png");
+        isInit = true;
     }
 
     public void render() {
@@ -58,19 +54,25 @@ public class MainService {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.begin();
-        // TODO: Other background
-        batch.draw(new Texture("background.png"), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.end();
         stage.act(delta);
         stage.draw();
-        batch.begin();
-        logger.draw();
-        batch.end();
+        if(DebugFeatures.isOverlayVisible()){
+            batch.begin();
+            logger.draw();
+            batch.end();
+        }
 
     }
 
     public void dispose() {
+        if(backgroundTexture != null){
+            backgroundTexture.dispose();
+        }
         batch.dispose();
+        font.dispose();
+        shape.dispose();
         stage.dispose();
         GlobalWorld.dispose();
     }

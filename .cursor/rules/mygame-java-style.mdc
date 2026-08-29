@@ -54,7 +54,7 @@ public class EntitySettings { ... }
 public class EntityStatus { ... }
 ```
 
-Не добавляй Lombok в legacy-классы (`PlayebleEntity`, services) без явной миграции.
+Не добавляй Lombok в сервисы (`MainService`, `KeyboardInputService`) без явной миграции.
 
 ## Комментарии
 
@@ -69,7 +69,6 @@ public class EntityStatus { ... }
 
 TODO: `// TODO: описание` или `//TODO: описание`.
 Legacy-метки: `//DONE`, `// PLAYER_MOVEMENT`.
-Закомментированный старый код (`//GlobalEntity...`) — не удаляй при мелких правках.
 
 ## Структура класса Entity
 
