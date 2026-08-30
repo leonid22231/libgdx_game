@@ -1,12 +1,17 @@
-package com.lyadev.mygame.entity_modules;
+package com.lyadev.mygame.modules.selectable;
 
 import com.badlogic.gdx.Gdx;
 
 import com.lyadev.mygame.base.Entity;
 import com.lyadev.mygame.base.EntityModule;
+import com.lyadev.mygame.modules.movement.MovementModule;
 import com.lyadev.mygame.world.GlobalWorld;
 
 public class SelectableModule extends EntityModule {
+    private boolean active = false;
+    private boolean focused = false;
+    private boolean visibleByVision = false;
+
     @Override
     public String getName() {
         return "selectable_module";
@@ -22,16 +27,42 @@ public class SelectableModule extends EntityModule {
         updateVisibility();
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+        updateVisibility();
+    }
+
+    public boolean isFocused() {
+        return focused;
+    }
+
+    public void setFocused(boolean focused) {
+        this.focused = focused;
+    }
+
+    public boolean isVisibleByVision() {
+        return visibleByVision;
+    }
+
+    public void setVisibleByVision(boolean visibleByVision) {
+        this.visibleByVision = visibleByVision;
+        updateVisibility();
+    }
+
     public void updateVisibility() {
         getEntity().setVisible(shouldRender());
     }
 
     public void mousePositionListener(float screenX, float screenY) {
-        getEntity().getStatus().setIsFocused(isMouseOver(screenX, screenY));
+        setFocused(isMouseOver(screenX, screenY));
     }
 
     public void clickEvent() {
-        if(Boolean.TRUE.equals(getEntity().getStatus().getIsFocused())){
+        if(focused){
             activateEntity();
         } else {
             deactivateEntity();
@@ -39,22 +70,11 @@ public class SelectableModule extends EntityModule {
     }
 
     public void clearVisionVisibility() {
-        getEntity().getStatus().setIsShow(false);
-        updateVisibility();
-    }
-
-    public void setVisibleByVision(boolean visible) {
-        getEntity().getStatus().setIsShow(visible);
-        updateVisibility();
-    }
-
-    public boolean isVisibleByVision() {
-        return Boolean.TRUE.equals(getEntity().getStatus().getIsShow());
+        setVisibleByVision(false);
     }
 
     public boolean shouldRender() {
-        Entity entity = getEntity();
-        return entity.getStatus().isActive() || isVisibleByVision();
+        return active || visibleByVision;
     }
 
     private void activateEntity() {
@@ -63,7 +83,7 @@ public class SelectableModule extends EntityModule {
 
     private void deactivateEntity() {
         Entity entity = getEntity();
-        entity.getStatus().setActive(false);
+        setActive(false);
         stopMovement(entity);
         if(entity == GlobalWorld.player){
             GlobalWorld.player = findActivePlayer();
@@ -73,7 +93,8 @@ public class SelectableModule extends EntityModule {
 
     private Entity findActivePlayer() {
         for(Entity entity : GlobalWorld.entities){
-            if(entity.getStatus().isActive()){
+            SelectableModule selectable = SelectableModule.from(entity);
+            if(selectable != null && selectable.isActive()){
                 return entity;
             }
         }
@@ -81,18 +102,18 @@ public class SelectableModule extends EntityModule {
     }
 
     private void stopMovement(Entity entity) {
-        EntityModule module = entity.getModule("movement_module");
-        if(module instanceof MovementModule){
-            ((MovementModule) module).stopMoving();
+        MovementModule movement = entity.getModule(MovementModule.class);
+        if(movement != null){
+            movement.stopMoving();
         }
     }
 
     private boolean isMouseOver(float screenX, float screenY) {
         Entity entity = getEntity();
-        float entityX = entity.getPosition().getX();
-        float entityY = entity.getPosition().getY();
-        float width = entity.getSize().getWidth();
-        float height = entity.getSize().getHeight();
+        float entityX = entity.getX();
+        float entityY = entity.getY();
+        float width = entity.getWidth();
+        float height = entity.getHeight();
         float screenBottomY = Gdx.graphics.getHeight() - entityY;
         float screenTopY = screenBottomY - height;
 
@@ -103,10 +124,6 @@ public class SelectableModule extends EntityModule {
     }
 
     public static SelectableModule from(Entity entity) {
-        EntityModule module = entity.getModule("selectable_module");
-        if(module instanceof SelectableModule){
-            return (SelectableModule) module;
-        }
-        return null;
+        return entity.getModule(SelectableModule.class);
     }
 }

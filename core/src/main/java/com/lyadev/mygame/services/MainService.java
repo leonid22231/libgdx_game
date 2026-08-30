@@ -92,4 +92,8 @@ public class MainService {
     public BitmapFont getFont() {
         return font;
     }
+
+    public Stage getStage() {
+        return stage;
+    }
 }

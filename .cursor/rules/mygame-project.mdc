@@ -10,9 +10,9 @@ alwaysApply: true
 
 ## Слои кода
 
-- `base/` — `Entity`, `EntitySettings`, `PlayableEntitySettings`, `EntityVision`, `EntityModule`
-- `world/` — `GlobalWorld` (статические списки и `player`)
-- `entity_modules/` — модули поведения (`TextureModule`, `SpriteModule`, `MovementModule`, `VisionModule`, `SelectableModule`, `PlayableModules`)
+- `base/` — `Entity`, `EntityModule`, `ModuleRegistry`, `ModuleInitializationService`
+- `modules/` — `texture/`, `sprite/`, `movement/`, `vision/`, `selectable/`, `playable/`, `ai/`
+- Модули инкапсулированы; общаются только друг с другом (`require`, `Module.from`). См. `docs/modules/communication.md`
 - Lombok: `@Getter`, `@Setter`, `@AllArgsConstructor`, `@RequiredArgsConstructor`, `@Builder`
 
 ## Singleton и глобальное состояние
@@ -40,14 +40,14 @@ dispose() → MainService.getInstance().dispose()
 - Рендер-сервисы берут ресурсы через `MainService.getInstance()`
 - Текстуры загружать один раз в `init()`, освобождать в `dispose()`
 
-## Модули сущностей
+- `world/` — `GlobalWorld` (статические списки и `player`)
+
+## Entity (lean core)
 
 ```java
-public class MovementModule extends EntityModule {
-    @Override
-    public String getName() { return "movement_module"; } // snake_case
-}
-// Entity: PlayableModules.register(entity) или addModule(new MovementModule())
+Entity entity = new Entity("Man");  // только tag
+PlayableModules.register(entity, blueprint);  // settings → модули
+// extends Actor — x/y/width/height на сцене
 ```
 
 ## Сохраняй существующие имена (опечатки — часть API)

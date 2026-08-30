@@ -1,132 +1,103 @@
 package com.lyadev.mygame.base;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.lyadev.mygame.modules.animation.AnimationModule;
+import com.lyadev.mygame.modules.sprite.SpriteModule;
 import com.lyadev.mygame.utils.Position;
 import com.lyadev.mygame.utils.Size;
-import com.lyadev.mygame.debug.DebugFeatures;
-import com.lyadev.mygame.entity_modules.SelectableModule;
-import com.lyadev.mygame.entity_modules.VisionModule;
-import com.lyadev.mygame.utils.listeners.EntityListener;
 
 import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
+/**
+ * Минимальное ядро: tag + Actor transform + модули. Без настроек — конфиг передаётся в модули при register.
+ */
 public class Entity extends Actor {
-    private EntitySettings settings;
-    private EntityTexture texture = new EntityTexture();
-    private EntityPosition position = new EntityPosition(0, 0);
-    private EntityStatus status = new EntityStatus();
-    private EntityVision vision = new EntityVision();
-    private Size size;
-    private String TAG;
-    private ArrayList<EntityModule> modules = new ArrayList<>();
+    private final String tag;
+    private final String TAG;
+    private final ArrayList<EntityModule> modules = new ArrayList<>();
+    private final ModuleRegistry moduleRegistry = new ModuleRegistry(this);
+    @Getter
+    private boolean modulesResolved = false;
 
-    public Entity(EntitySettings settings) {
-        this.settings = settings;
-        setTag();
+    public Entity(String tag) {
+        this.tag = tag;
+        this.TAG = String.format("Player[%s]", tag);
     }
 
-    public void finishInit() {
-        vision.init(this);
-        status.setIsInit(true);
+    public String getTag() {
+        return tag;
+    }
+
+    public String getTAG() {
+        return TAG;
     }
 
     @Override
     public void act(float delta) {
+        EntityModule deferredVisualModule = null;
         for(EntityModule module : modules){
+            if(!module.isRuntimeActive()){
+                continue;
+            }
+            if(module instanceof SpriteModule || module instanceof AnimationModule){
+                deferredVisualModule = module;
+                continue;
+            }
             module.act(delta);
         }
-        vision.update();
+        if(deferredVisualModule != null && deferredVisualModule.isRuntimeActive()){
+            deferredVisualModule.act(delta);
+        }
     }
 
-    // NOTE: DRAWING METHODS
     @Override
     public void draw(Batch batch, float parentAlpha) {
         for(EntityModule module : modules){
-            module.draw(batch, parentAlpha);
-        }
-        if(shouldDrawVision()){
-            debugDraw(batch);
+            if(module.isRuntimeActive()){
+                module.draw(batch, parentAlpha);
+            }
         }
     }
 
-    private boolean shouldDrawVision() {
-        if(!DebugFeatures.isVisionLinesVisible()){
-            return false;
-        }
-        SelectableModule selectable = SelectableModule.from(this);
-        if(selectable == null){
-            return true;
-        }
-        return selectable.shouldRender();
-    }
-
-    private void debugDraw(Batch batch) {
-        batch.end();
-        vision.draw();
-        VisionModule visionModule = VisionModule.from(this);
-        if(visionModule != null){
-            visionModule.drawDebugVision();
-        }
-        batch.begin();
-    }
-
-    // NOTE: GLOBAL METHODS
     public void setRandomPositionInScreen() {
         Random random = new Random();
-        Size entitySize = getSize();
-        float width = entitySize.getWidth();
-        float height = entitySize.getHeight();
+        float width = getWidth() > 0 ? getWidth() : Size.ENTITY_DEFAULT.getWidth();
+        float height = getHeight() > 0 ? getHeight() : Size.ENTITY_DEFAULT.getHeight();
 
-        position.setX(width + random.nextFloat() * ((Gdx.graphics.getWidth() - width) - width));
-        position.setY(height + random.nextFloat() * ((Gdx.graphics.getHeight() - height) - height));
+        setX(width + random.nextFloat() * ((Gdx.graphics.getWidth() - width) - width));
+        setY(height + random.nextFloat() * ((Gdx.graphics.getHeight() - height) - height));
     }
 
-    // NOTE: LOGIC METHODS (PRIVATE METHODS)
-    private void setupSize(Size entitySize) {
-        this.size = entitySize;
-    }
-
-    public void setSize(Size entitySize) {
-        setupSize(entitySize);
-    }
-
-    // NOTE: Private
-    private void setTag(){
-       TAG = String.format("Player[%s]", settings.getTag());
-    }
-
-    // NOTE: Custom GETTERS
     public Position getCenterPosition() {
-        return position.getCenterPositionFromSize(getSize());
+        return new Position(getX() + getWidth() / 2f, getY() + getHeight() / 2f);
     }
 
-    public Size getSize() {
-        if (size == null)
-            return Size.ENTITY_DEFAULT;
-
-        return size;
+    public void registerModule(EntityModule module) {
+        moduleRegistry.register(module);
     }
 
-    public PlayableEntitySettings getPlayableSettings() {
-        if(settings instanceof PlayableEntitySettings){
-            return (PlayableEntitySettings) settings;
-        }
-        return null;
+    public void resolveModules() {
+        moduleRegistry.resolveAndInit();
+        modules.clear();
+        modules.addAll(moduleRegistry.getActiveModules());
+        modulesResolved = true;
     }
 
-    //NOTE: Modules
-    public void addModule(EntityModule module){
-        module.attach(this);
-        modules.add(module);
-        module.init();
+    /** @deprecated use {@link #registerModule(EntityModule)} and {@link #resolveModules()} */
+    @Deprecated
+    public void addModule(EntityModule module) {
+        registerModule(module);
+        resolveModules();
+    }
+
+    public boolean hasModule(String name) {
+        return getModule(name) != null;
     }
 
     public EntityModule getModule(String name) {
@@ -135,29 +106,52 @@ public class Entity extends Actor {
                 return module;
             }
         }
+        for(EntityModule module : moduleRegistry.getActiveModules()){
+            if(module.getName().equals(name)){
+                return module;
+            }
+        }
         return null;
     }
 
-    // NOTE: Dispose method
-    public void dispose() {
+    @SuppressWarnings("unchecked")
+    public <T extends EntityModule> T getModule(Class<T> type) {
         for(EntityModule module : modules){
-            module.dispose();
+            if(type.isInstance(module)){
+                return (T) module;
+            }
         }
-        texture.dispose();
-        EntityListener listener = status.getListener();
-        if(listener != null){
-            listener.dispose();
+        for(EntityModule module : moduleRegistry.getActiveModules()){
+            if(type.isInstance(module)){
+                return (T) module;
+            }
+        }
+        return null;
+    }
+
+    public EntityModule getRegisteredModule(String name) {
+        for(EntityModule module : moduleRegistry.getRegisteredModules()){
+            if(module.getName().equals(name)){
+                return module;
+            }
+        }
+        return null;
+    }
+
+    public List<EntityModule> getRegisteredModules() {
+        return moduleRegistry.getRegisteredModules();
+    }
+
+    public void dispose() {
+        for(EntityModule module : moduleRegistry.getActiveModules()){
+            module.dispose();
         }
     }
 
-    // NOTE: toString
     @Override
     public String toString() {
-        Size entitySize = getSize();
         return String.format(
-                "%s x[%.3f], y[%.3f], h[%s], w[%s], active[%s], focused[%s], sprite[%s], visibleObjects[%s]",
-                TAG, position.getX(),
-                position.getY(), entitySize.getHeight(), entitySize.getWidth(), status.isActive(), status.getIsFocused(),
-                texture.getCurrentSpriteIndex(), vision.getVisibleEntities().size());
+                "%s x[%.3f], y[%.3f], w[%.1f], h[%.1f]",
+                TAG, getX(), getY(), getWidth(), getHeight());
     }
 }

@@ -1,12 +1,21 @@
 {
   "java.configuration.updateBuildConfiguration": "automatic",
+  "java.import.gradle.enabled": true,
+  "java.import.gradle.wrapper.enabled": true,
+  "java.jdt.ls.lombokSupport.enabled": true,
+  "java.compile.nullAnalysis.mode": "disabled",
   "java.import.gradle.java.home": "C:\\Users\\Administrator\\.gradle\\jdks\\eclipse_adoptium-17-amd64-windows\\jdk-17.0.16+8",
   "java.debug.settings.console": "integratedTerminal",
   "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-11",
+      "path": "C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.32.101-hotspot"
+    },
     {
       "name": "JavaSE-17",
       "path": "C:\\Users\\Administrator\\.gradle\\jdks\\eclipse_adoptium-17-amd64-windows\\jdk-17.0.16+8",
       "default": true
     }
-  ]
+  ],
+  "java.project.referencedLibraries": []
 }

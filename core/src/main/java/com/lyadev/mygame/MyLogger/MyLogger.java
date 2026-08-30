@@ -13,9 +13,10 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.lyadev.mygame.base.Entity;
 import com.lyadev.mygame.debug.DebugFeatures;
 import com.lyadev.mygame.debug.DebugLogEntry;
+import com.lyadev.mygame.modules.selectable.SelectableModule;
+import com.lyadev.mygame.modules.vision.VisionDebug;
 import com.lyadev.mygame.services.MainService;
 import com.lyadev.mygame.utils.ViewPosition;
-import com.lyadev.mygame.utils.listeners.EntityListenerThread;
 import com.lyadev.mygame.views.Views;
 import com.lyadev.mygame.world.GlobalWorld;
 
@@ -103,20 +104,14 @@ public class MyLogger implements ApplicationLogger {
         lines.add(String.format("Players: %s  |  Current: %s", GlobalWorld.entities.size(),
                 GlobalWorld.player != null ? GlobalWorld.player.toString() : "None"));
         for(Entity entity : GlobalWorld.entities){
-            if(!entity.getStatus().isActive()){
+            SelectableModule selectable = SelectableModule.from(entity);
+            if(selectable == null || !selectable.isActive()){
                 lines.add("Inactive: " + entity.toString());
             }
         }
-        lines.add(String.format("Listener threads: %s", GlobalWorld.listeners != null ? GlobalWorld.listeners.size() : 0));
-        if(GlobalWorld.listeners != null){
-            for(int i = 0; i < GlobalWorld.listeners.size(); i++){
-                EntityListenerThread thread = GlobalWorld.listeners.get(i).thread;
-                if(thread.isActive()){
-                    lines.add(String.format("  Listener[%s] running %ss", thread.getName(), thread.getRuntimeSeconds()));
-                } else {
-                    lines.add(String.format("  Listener[%s] stopped", thread.getName()));
-                }
-            }
+        lines.add(String.format("Vision modules: %s", VisionDebug.getActiveModuleCount()));
+        for(String line : VisionDebug.collectBackgroundThreadLines()){
+            lines.add(line);
         }
         lines.add(String.format("Vision lines: %s  |  Overlay: %s",
                 DebugFeatures.isVisionLinesVisible() ? "ON" : "OFF",
