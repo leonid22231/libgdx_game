@@ -30,6 +30,8 @@ public final class DebugCommandService {
                 return listEntities();
             case "player":
                 return handlePlayer(parts);
+            case "spawn":
+                return handleSpawn(parts);
             default:
                 return "Unknown command: " + command + ". Type help";
         }
@@ -44,6 +46,7 @@ public final class DebugCommandService {
                 "  overlay [on|off|toggle]",
                 "  entities",
                 "  player <tag>",
+                "  spawn <man|woman|newgirl>",
                 "Keys:",
                 "  Alt+Right - toggle vision lines",
                 "  Alt+Left  - toggle in-game overlay");
@@ -108,11 +111,18 @@ public final class DebugCommandService {
         }
         String tag = parts[1];
         for(Entity entity : GlobalWorld.entities){
-            if(entity.getSettings().getTag().equalsIgnoreCase(tag)){
+            if(entity.getTag().equalsIgnoreCase(tag)){
                 GlobalWorld.setActivePlayer(entity);
                 return "Active player: " + entity.getTAG();
             }
         }
         return "Player not found: " + tag;
+    }
+
+    private static String handleSpawn(String[] parts) {
+        if(parts.length < 2){
+            return "Usage: spawn <man|woman>";
+        }
+        return DebugEntityService.spawnPlayablePreset(parts[1]);
     }
 }

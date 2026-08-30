@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MyGame Desktop" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.lyadev.mygame.lwjgl3.Lwjgl3Launcher" />
+    <module name="Games.lwjgl3.main" />
+    <option name="SHORTEN_COMMAND_LINE" value="NONE" />
+    <option name="VM_PARAMETERS" value="-Dfile.encoding=UTF-8" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/assets" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -4,9 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.lyadev.mygame.base.Entity;
-import com.lyadev.mygame.base.EntityModule;
 import com.lyadev.mygame.debug.DebugFeatures;
-import com.lyadev.mygame.entity_modules.MovementModule;
+import com.lyadev.mygame.modules.movement.MovementModule;
+import com.lyadev.mygame.modules.selectable.SelectableModule;
 import com.lyadev.mygame.world.GlobalWorld;
 
 public class KeyboardInputService implements InputProcessor {
@@ -24,7 +24,11 @@ public class KeyboardInputService implements InputProcessor {
         if (movement == null) {
             return;
         }
-        if (!GlobalWorld.player.getStatus().isActive()) {
+        if (GlobalWorld.player == null) {
+            return;
+        }
+        SelectableModule selectable = SelectableModule.from(GlobalWorld.player);
+        if (selectable == null || !selectable.isActive()) {
             return;
         }
         switch (keycode) {
@@ -49,11 +53,7 @@ public class KeyboardInputService implements InputProcessor {
     }
 
     private MovementModule getMovementModule(Entity entity) {
-        EntityModule module = entity.getModule("movement_module");
-        if (module instanceof MovementModule) {
-            return (MovementModule) module;
-        }
-        return null;
+        return entity.getModule(MovementModule.class);
     }
 
     @Override
