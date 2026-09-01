@@ -28,10 +28,17 @@ public final class DebugCommandService {
                 return handleOverlay(parts);
             case "entities":
                 return listEntities();
+            case "keys":
+            case "bindings":
+                return listKeyBindings();
             case "player":
                 return handlePlayer(parts);
             case "spawn":
                 return handleSpawn(parts);
+            case "worlds":
+                return DebugWorldService.listWorlds();
+            case "world":
+                return handleWorld(parts);
             default:
                 return "Unknown command: " + command + ". Type help";
         }
@@ -45,11 +52,25 @@ public final class DebugCommandService {
                 "  vision [on|off|toggle]",
                 "  overlay [on|off|toggle]",
                 "  entities",
+                "  keys | bindings",
                 "  player <tag>",
-                "  spawn <man|woman|newgirl>",
-                "Keys:",
-                "  Alt+Right - toggle vision lines",
-                "  Alt+Left  - toggle in-game overlay");
+                "  spawn <man|woman|newgirl|cat>",
+                "  worlds",
+                "  world travel <id> [col row]   — move active entity",
+                "  world switch <id>             — activate world, no entity move",
+                "Keys: see `keys` command / Debug Console Keys tab");
+    }
+
+    private static String listKeyBindings() {
+        java.util.List<String> lines = com.lyadev.mygame.base.ModuleInputRegistry.collectDebugLines();
+        if(lines.isEmpty()){
+            return "No key bindings registered";
+        }
+        StringBuilder builder = new StringBuilder("Key bindings:").append(System.lineSeparator());
+        for(String line : lines){
+            builder.append("  ").append(line).append(System.lineSeparator());
+        }
+        return builder.toString().trim();
     }
 
     private static String handleVision(String[] parts) {
@@ -121,8 +142,55 @@ public final class DebugCommandService {
 
     private static String handleSpawn(String[] parts) {
         if(parts.length < 2){
-            return "Usage: spawn <man|woman>";
+            return "Usage: spawn <man|woman|newgirl|cat>";
         }
         return DebugEntityService.spawnPlayablePreset(parts[1]);
+    }
+
+    private static String handleWorld(String[] parts) {
+        if(parts.length < 2){
+            return "Usage: world travel <id> [col row] | world switch <id>";
+        }
+        String mode = parts[1].toLowerCase();
+        if("travel".equals(mode)){
+            if(parts.length < 3){
+                return "Usage: world travel <id> [col row]";
+            }
+            Integer col = null;
+            Integer row = null;
+            if(parts.length >= 5){
+                try {
+                    col = Integer.parseInt(parts[3]);
+                    row = Integer.parseInt(parts[4]);
+                } catch(NumberFormatException error) {
+                    return "Usage: world travel <id> [col row]";
+                }
+            } else if(parts.length == 4){
+                return "Usage: world travel <id> [col row]";
+            }
+            return DebugWorldService.travelWithActiveEntity(parts[2], col, row);
+        }
+        if("switch".equals(mode)){
+            if(parts.length < 3){
+                return "Usage: world switch <id>";
+            }
+            return DebugWorldService.switchWithoutEntity(parts[2]);
+        }
+        // Back-compat: `world <id>` = travel with active entity
+        Integer col = null;
+        Integer row = null;
+        if(parts.length >= 3){
+            if(parts.length >= 4){
+                try {
+                    col = Integer.parseInt(parts[2]);
+                    row = Integer.parseInt(parts[3]);
+                } catch(NumberFormatException error) {
+                    return "Usage: world travel <id> [col row] | world switch <id>";
+                }
+            } else {
+                return "Usage: world travel <id> [col row] | world switch <id>";
+            }
+        }
+        return DebugWorldService.travelWithActiveEntity(parts[1], col, row);
     }
 }

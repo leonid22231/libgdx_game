@@ -1,0 +1,19 @@
+{
+  "decorAtlas": "tiles/topdown/decor/Decorations.png",
+  "note": "Crops from connected-component bounds on Decorations.png — one instance each (sheet has duplicates).",
+  "props": [
+    { "id": "bush_a", "src": [13, 4, 35, 27] },
+    { "id": "log_a", "src": [75, 0, 40, 32] },
+    { "id": "mushroom_a", "src": [136, 9, 16, 14] },
+    { "id": "mushroom_b", "src": [173, 10, 10, 12] },
+    { "id": "mushroom_c", "src": [204, 8, 12, 14] },
+    { "id": "grass_tuft_a", "src": [8, 70, 14, 22] },
+    { "id": "reed_a", "src": [68, 67, 24, 27] },
+    { "id": "rock_a", "src": [169, 109, 15, 11] },
+    { "id": "rocks_a", "src": [163, 133, 26, 22] },
+    { "id": "tree_a", "src": [11, 143, 70, 98] },
+    { "id": "tree_b", "src": [88, 143, 70, 94] },
+    { "id": "pine_a", "src": [163, 163, 38, 74] },
+    { "id": "pine_b", "src": [211, 163, 38, 70] }
+  ]
+}

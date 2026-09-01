@@ -50,6 +50,7 @@ public final class ModuleInitializationService {
             module.bindDependencies(buildDependencyMap(module, byClass, activeClasses));
             module.markEnabled();
             activeModules.add(module);
+            ModuleInputRegistry.resolve(module);
             EntityModule.beginInit(module);
             try {
                 module.init();

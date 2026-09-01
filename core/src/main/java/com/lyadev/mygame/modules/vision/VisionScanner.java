@@ -41,7 +41,7 @@ final class VisionScanner {
             LineFromRect line,
             CircleSector sector) {
         for(Point point : pointsOnLine(line.start, line.end)){
-            if(distance(centerX, centerY, point) <= radius && !sector.inOutSector(point)){
+            if(distance(centerX, centerY, point) <= radius && sector.contains(point)){
                 return true;
             }
         }

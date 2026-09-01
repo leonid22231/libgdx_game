@@ -10,5 +10,5 @@ import lombok.RequiredArgsConstructor;
 public final class TextureSettings {
     private final String texturePath;
     private final Size frameSize;
-    private final int scaleFactor;
+    private final float scaleFactor;
 }

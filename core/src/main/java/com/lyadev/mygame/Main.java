@@ -24,6 +24,11 @@ public class Main extends ApplicationAdapter{
     }
 
     @Override
+    public void resize(int width, int height) {
+        MainService.getInstance().resize(width, height);
+    }
+
+    @Override
     public void dispose() {
         DebugBootstrap.onGameDispose();
         MainService.getInstance().dispose(); 

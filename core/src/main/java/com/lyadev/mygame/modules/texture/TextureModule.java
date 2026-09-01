@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.lyadev.mygame.base.Entity;
 import com.lyadev.mygame.base.EntityModule;
+import com.lyadev.mygame.debug.ModuleDebugPanel;
 import com.lyadev.mygame.modules.animation.AnimationSettings;
 import com.lyadev.mygame.modules.selectable.SelectableModule;
 import com.lyadev.mygame.utils.Size;
@@ -57,12 +58,42 @@ public class TextureModule extends EntityModule {
         if(frame == null){
             return;
         }
-        batch.draw(frame, entity.getX(), entity.getY(), entity.getWidth(), entity.getHeight());
+        float drawX = entity.getX();
+        float drawY = entity.getY();
+        float width = entity.getWidth();
+        float height = entity.getHeight();
+
+        if(entityTexture.isFlipHorizontal()){
+            batch.draw(frame, drawX + width, drawY, -width, height);
+        } else {
+            batch.draw(frame, drawX, drawY, width, height);
+        }
     }
 
     @Override
     public void dispose() {
         entityTexture.dispose();
+    }
+
+    @Override
+    public void populateDebugScreen(ModuleDebugPanel panel) {
+        super.populateDebugScreen(panel);
+        if(!isEnabled()){
+            return;
+        }
+        boolean animated = animationSettings != null;
+        panel.line("mode", animated ? "animated" : "static");
+        panel.line("drawSize", entityTexture.getTextureSize());
+        if(animated){
+            panel.line("activeClip", entityTexture.getActiveClipId());
+            panel.line("activeRow", entityTexture.getActiveRow());
+            panel.line("activeColumn", entityTexture.getActiveColumn());
+            panel.line("flipHorizontal", entityTexture.isFlipHorizontal());
+            panel.line("directionMode", animationSettings.getDirectionMode());
+        } else {
+            panel.line("regions", entityTexture.getAllTextureRegions().size());
+            panel.line("spriteIndex", entityTexture.getCurrentSpriteIndex());
+        }
     }
 
     public static TextureModule from(Entity entity) {

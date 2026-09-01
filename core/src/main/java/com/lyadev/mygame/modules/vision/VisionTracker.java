@@ -3,10 +3,8 @@ package com.lyadev.mygame.modules.vision;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.lyadev.mygame.base.Entity;
-import com.lyadev.mygame.services.MainService;
 import com.lyadev.mygame.utils.LineFromRect;
 import com.lyadev.mygame.utils.Point;
 
@@ -66,21 +64,22 @@ final class VisionTracker {
         return new ArrayList<>(visibleEntities);
     }
 
-    void drawContour() {
-        if(!initialized){
+    void drawContour(ShapeRenderer shape) {
+        if(!initialized || shape == null){
             return;
         }
-        MainService.getInstance().getShapeRenderer().begin(ShapeType.Line);
         for(int i = 0; i < linesFromRect.length; i++){
-            Color color = visibleLines[i] ? Color.RED : Color.GREEN;
-            MainService.getInstance().getShapeRenderer().setColor(color);
-            MainService.getInstance().getShapeRenderer().line(
+            if(visibleLines[i]){
+                shape.setColor(1f, 0.2f, 0.2f, 1f);
+            } else {
+                shape.setColor(0.2f, 0.9f, 0.3f, 1f);
+            }
+            shape.line(
                     linesFromRect[i].start.x,
                     linesFromRect[i].start.y,
                     linesFromRect[i].end.x,
                     linesFromRect[i].end.y);
         }
-        MainService.getInstance().getShapeRenderer().end();
     }
 
     private void setVisibleLines(LineFromRect[] lines) {

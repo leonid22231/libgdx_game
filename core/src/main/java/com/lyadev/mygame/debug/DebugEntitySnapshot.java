@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DebugEntitySnapshot {
+    public static final String KIND_ACTOR = "actor";
+    public static final String KIND_TILE = "tile";
+    public static final String KIND_PROP = "prop";
+
+    public final String kind;
     public final String tag;
     public final String displayTag;
     public final float x;
@@ -21,6 +26,7 @@ public class DebugEntitySnapshot {
     public final List<DebugModuleSnapshot> modules;
 
     public DebugEntitySnapshot(
+            String kind,
             String tag,
             String displayTag,
             float x,
@@ -36,6 +42,7 @@ public class DebugEntitySnapshot {
             int spriteIndex,
             boolean currentPlayer,
             List<DebugModuleSnapshot> modules) {
+        this.kind = kind == null ? KIND_ACTOR : kind;
         this.tag = tag;
         this.displayTag = displayTag;
         this.x = x;
@@ -54,6 +61,9 @@ public class DebugEntitySnapshot {
     }
 
     public String listLabel() {
+        if(KIND_TILE.equals(kind) || KIND_PROP.equals(kind)){
+            return tag;
+        }
         String marker = currentPlayer ? " *" : "";
         String state = active ? "active" : "idle";
         return tag + marker + " [" + state + "]";

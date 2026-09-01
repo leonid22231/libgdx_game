@@ -29,6 +29,7 @@ public class EntityTexture {
     private String activeClipId;
     private int activeRow;
     private int activeColumn;
+    private boolean flipHorizontal;
 
     public void init(TextureSettings settings) {
         clearAnimated();
@@ -37,6 +38,7 @@ public class EntityTexture {
         String textureString = settings.getTexturePath();
 
         sheetTexture = new Texture(textureString);
+        sheetTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         TextureRegion sheetRegion = new TextureRegion(sheetTexture);
         regionsCount = sheetRegion.getRegionWidth() / frameWidth;
 
@@ -140,6 +142,7 @@ public class EntityTexture {
         int frameWidth = clip.getFrameSize().getWidth();
         int frameHeight = clip.getFrameSize().getHeight();
         Texture texture = new Texture(clip.getSheetPath());
+        texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         TextureRegion[][] regions = new TextureRegion[clip.getRows()][clip.getColumns()];
         for(int row = 0; row < clip.getRows(); row++){
             int textureRow = clip.getRows() - 1 - row;

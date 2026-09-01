@@ -27,12 +27,14 @@ GlobalWorld.spawnPlayableEntity(blueprint)
 | `texture/` | TextureModule, TextureSettings, EntityTexture |
 | `sprite/` | SpriteModule, SpriteSettings — статичный strip (man, блоки) |
 | `animation/` | AnimationModule, AnimationSettings, AnimationClip — idle/walk/run |
-| `movement/` | MovementModule, MovementSettings |
-| `vision/` | VisionModule, VisionSettings, VisionTracker |
+| `movement/` | MovementModule — `facingDirection` (4 стороны) + угол vision |
+| `vision/` | VisionModule, VisionSettings, … |
+| `visionmouse/` | VisionMouseModule — free look (только animated/newgirl) |
 | `selectable/` | SelectableModule |
 | `ai/` | AiBrainModule — тестовый AI (man в GlobalWorld) |
-| `example/` | ExampleModule — шпаргалка, **не в игре** |
+| `example/` | ExampleModule — шпаргалка, **не в игре** → `modules/example/README.md` |
 | `playable/` | PlayableBlueprint, PlayableModules |
+| `camera/` | CameraFollowModule — камера за active entity |
 
 ## Зависимости модулей
 
@@ -60,6 +62,9 @@ VisionModule, SelectableModule — без deps
 - [Entity lean core](./entity-core.md)
 - [Общение модулей](./communication.md)
 - [Зависимости модулей](./dependencies.md)
+- [ExampleModule — шпаргалка](../../core/src/main/java/com/lyadev/mygame/modules/example/README.md)
+- [UI-слой модулей](./ui-layer.md)
+- [Клавиши модулей](../../core/src/main/java/com/lyadev/mygame/base/README-input.md)
 - [Debug Console](./debug-console.md)
 
 ## План

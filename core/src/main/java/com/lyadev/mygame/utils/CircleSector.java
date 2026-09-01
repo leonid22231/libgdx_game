@@ -12,14 +12,24 @@ public class CircleSector {
         this.angleEnd = angleEnd;
     }
 
-    public boolean inOutSector(Point p) {
-        double angle1 = Math.toRadians(angleStart);
-        double angle2 = Math.toRadians(angleEnd);
-        double pointAngle = Math.atan2(p.y - centerY, p.x - centerX);
+    /**
+     * Point inside the wedge between {@code angleStart} and {@code angleEnd} (degrees).
+     * Uses shortest angular distance from the mid-angle so left/wrap (±180°) works with {@code atan2}.
+     */
+    public boolean contains(Point p) {
+        double pointAngle = Math.toDegrees(Math.atan2(p.y - centerY, p.x - centerX));
+        double mid = (angleStart + angleEnd) * 0.5;
+        double halfWidth = Math.abs(angleStart - angleEnd) * 0.5;
+        return Math.abs(deltaDegrees(pointAngle - mid)) <= halfWidth;
+    }
 
-        if (angle1 > angle2) {
-            return pointAngle >= angle1 || pointAngle <= angle2;
+    private static double deltaDegrees(double degrees) {
+        double d = degrees % 360.0;
+        if(d > 180.0){
+            d -= 360.0;
+        } else if(d < -180.0){
+            d += 360.0;
         }
-        return pointAngle >= angle1 && pointAngle <= angle2;
+        return d;
     }
 }

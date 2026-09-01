@@ -6,63 +6,97 @@ import java.util.List;
 import com.badlogic.gdx.ApplicationLogger;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL30;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.lyadev.mygame.base.Entity;
+import com.lyadev.mygame.debug.DebugEntityService;
 import com.lyadev.mygame.debug.DebugFeatures;
 import com.lyadev.mygame.debug.DebugLogEntry;
 import com.lyadev.mygame.modules.selectable.SelectableModule;
 import com.lyadev.mygame.modules.vision.VisionDebug;
-import com.lyadev.mygame.services.MainService;
-import com.lyadev.mygame.utils.ViewPosition;
-import com.lyadev.mygame.views.Views;
 import com.lyadev.mygame.world.GlobalWorld;
+import com.lyadev.mygame.world.WorldCameraControl;
+import com.lyadev.mygame.world.WorldController;
+import com.lyadev.mygame.world.topdown.OrthoTileHit;
+import com.lyadev.mygame.world.topdown.TopDownMapWorld;
 
+import lombok.Getter;
+import lombok.Setter;
+
+/**
+ * Application logger + on-screen HUD. Drawn in screen space (not world camera).
+ */
 public class MyLogger implements ApplicationLogger {
-    final List<Message> messages = new ArrayList<>();
-    final String VERSION = "1.0";
-    Boolean active = true;
-    Boolean isFocused = false;
-    float height = 0;
-    float width = 0;
-    float scrollOffset = 0;
-    float mousePositionX = 0;
-    float mousePositionY = 0;
-    List<String> lastKeys = new ArrayList<>();
-    float lastScroll = 0;
-    int lastTapScreenX; 
-    int lastTapScreenY; 
-    int lastTapPointer; 
-    int lastTapButton;
-    long startTime = TimeUtils.millis();
-    public void setLastTap(int screenX, int screenY, int pointer, int button){
+    private static final String VERSION = "1.0";
+    private static final int MAX_STORED_MESSAGES = 80;
+    private static final int MAX_VISIBLE_LOGS = 18;
+    private static final float LINE_HEIGHT = 16f;
+    private static final float PAD = 10f;
+    private static final float STATUS_REFRESH_SEC = 0.2f;
+    private static final Color PANEL_BG = new Color(0.08f, 0.09f, 0.12f, 0.82f);
+    private static final Color PANEL_LINE = new Color(0.25f, 0.28f, 0.35f, 0.95f);
+    private static final Color STATUS_COLOR = new Color(0.78f, 0.88f, 0.95f, 1f);
+
+    private final List<Message> messages = new ArrayList<>();
+    private final List<String> cachedStatus = new ArrayList<>();
+    private final GlyphLayout layout = new GlyphLayout();
+    private final List<String> lastKeys = new ArrayList<>();
+
+    @Getter
+    @Setter
+    private boolean active = true;
+    @Getter
+    @Setter
+    private boolean focused = false;
+    private float height = 0;
+    private float width = 0;
+    private float scrollOffset = 0;
+    private float mousePositionX = 0;
+    private float mousePositionY = 0;
+    private float lastScroll = 0;
+    private float statusAge = 99f;
+    private int lastTapScreenX;
+    private int lastTapScreenY;
+    private int lastTapPointer;
+    private int lastTapButton;
+    private final long startTime = TimeUtils.millis();
+
+    public void setLastTap(int screenX, int screenY, int pointer, int button) {
         lastTapScreenX = screenX;
         lastTapScreenY = screenY;
         lastTapPointer = pointer;
         lastTapButton = button;
     }
-    public void setScroll(float scroll){
+
+    public void setScroll(float scroll) {
         lastScroll = scroll;
-        if(isFocused)
-            this.scrollOffset+= scroll * 20;
-    }
-    public void mousePositionListener(float x, float y){
-        mousePositionX = x;
-        mousePositionY = y;
-        isFocused = mousePositionY < Gdx.graphics.getHeight() && mousePositionY > 0 && mousePositionX < width && mousePositionX > 0;
+        if(focused){
+            scrollOffset += scroll * LINE_HEIGHT;
+        }
     }
 
-    public void addKey(String key){
-        if(lastKeys.size()<=5){
+    public void mousePositionListener(float x, float y) {
+        mousePositionX = x;
+        mousePositionY = y;
+        focused = mousePositionY < Gdx.graphics.getHeight() && mousePositionY > 0
+                && mousePositionX < width && mousePositionX > 0;
+    }
+
+    public void addKey(String key) {
+        if(lastKeys.size() <= 5){
             lastKeys.add(key);
-        }else{
+        } else {
             lastKeys.remove(0);
             lastKeys.add(key);
         }
     }
-    public void clearLogs(){
+
+    public void clearLogs() {
         synchronized(messages){
             messages.clear();
         }
@@ -83,49 +117,151 @@ public class MyLogger implements ApplicationLogger {
     }
 
     public List<String> collectStatusLines() {
-        if(GlobalWorld.entities == null){
-            return List.of("World not initialized");
+        refreshStatusIfNeeded(true);
+        return new ArrayList<>(cachedStatus);
+    }
+
+    /**
+     * HUD draw. Caller must set screen projection on batch/shape first.
+     * Shape pass first, then text — avoids mid-batch flush per line.
+     */
+    public void draw(SpriteBatch batch, ShapeRenderer shape, BitmapFont font) {
+        if(!active){
+            return;
         }
+        refreshStatusIfNeeded(false);
+
+        List<Message> visibleLogs;
+        synchronized(messages){
+            int start = Math.max(0, messages.size() - MAX_VISIBLE_LOGS);
+            visibleLogs = new ArrayList<>(messages.subList(start, messages.size()));
+        }
+
+        int statusCount = cachedStatus.size();
+        int logCount = visibleLogs.size();
+        int totalLines = statusCount + (logCount > 0 ? 1 + logCount : 0);
+        float panelHeight = PAD * 2f + totalLines * LINE_HEIGHT;
+        float screenH = Gdx.graphics.getHeight();
+        float topY = screenH - PAD + scrollOffset;
+
+        float maxWidth = 220f;
+        font.getData().setScale(1f);
+        for(String line : cachedStatus){
+            layout.setText(font, line);
+            maxWidth = Math.max(maxWidth, layout.width);
+        }
+        for(Message message : visibleLogs){
+            layout.setText(font, message.toString());
+            maxWidth = Math.max(maxWidth, layout.width);
+        }
+        float panelWidth = maxWidth + PAD * 2f;
+        float panelY = topY - panelHeight + LINE_HEIGHT;
+
+        batch.end();
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        shape.begin(ShapeType.Filled);
+        shape.setColor(PANEL_BG);
+        shape.rect(0f, panelY - PAD, panelWidth, panelHeight + PAD);
+        shape.end();
+        shape.begin(ShapeType.Line);
+        shape.setColor(PANEL_LINE);
+        shape.rect(0f, panelY - PAD, panelWidth, panelHeight + PAD);
+        shape.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+        batch.begin();
+
+        font.setColor(STATUS_COLOR);
+        float y = topY;
+        for(String line : cachedStatus){
+            font.draw(batch, line, PAD, y);
+            y -= LINE_HEIGHT;
+        }
+        if(logCount > 0){
+            font.setColor(STATUS_COLOR);
+            font.draw(batch, "----------------------------", PAD, y);
+            y -= LINE_HEIGHT;
+            for(Message message : visibleLogs){
+                font.setColor(message.level.getColor());
+                font.draw(batch, message.toString(), PAD, y);
+                y -= LINE_HEIGHT;
+            }
+        }
+        font.setColor(Color.WHITE);
+        width = panelWidth;
+        height = panelHeight;
+    }
+
+    private void refreshStatusIfNeeded(boolean force) {
+        statusAge += Gdx.graphics != null ? Gdx.graphics.getDeltaTime() : STATUS_REFRESH_SEC;
+        if(!force && statusAge < STATUS_REFRESH_SEC){
+            return;
+        }
+        statusAge = 0f;
+        cachedStatus.clear();
+        if(GlobalWorld.entities == null){
+            cachedStatus.add("World not initialized");
+            return;
+        }
+
         long elapsedTime = TimeUtils.timeSinceMillis(startTime);
         double seconds = elapsedTime / 1000.0;
         String activeTime = seconds < 60
                 ? String.format("%02d s.", elapsedTime / 1000)
                 : String.format("%02d m. %02d s.", (elapsedTime / 1000) / 60, (elapsedTime / 1000) % 60);
 
-        List<String> lines = new ArrayList<>();
-        lines.add(String.format("Logger V.%s  |  Uptime: %s", VERSION, activeTime));
+        cachedStatus.add(String.format("Logger V.%s  |  Uptime: %s", VERSION, activeTime));
+        cachedStatus.add("Active world: " + GlobalWorld.activeWorldLabel());
+        cachedStatus.add(String.format("worlds=%d active=%s",
+                WorldController.allWorlds().size(),
+                WorldController.getActive() != null ? WorldController.getActive().getId() : "none"));
         if(Gdx.graphics != null){
-            lines.add(String.format("FPS: %s  |  Delta: %.2f ms", Gdx.graphics.getFramesPerSecond(), Gdx.graphics.getDeltaTime() * 1000));
+            cachedStatus.add(String.format("FPS: %s  |  Delta: %.2f ms",
+                    Gdx.graphics.getFramesPerSecond(), Gdx.graphics.getDeltaTime() * 1000));
         }
-        lines.add(String.format("Mouse: x=%.0f, y=%.0f  |  Focus: %s  |  Scroll: %s", mousePositionX, mousePositionY,
-                isFocused ? "Yes" : "No", lastScroll < 0 ? "Up" : "Down"));
-        lines.add(String.format("Last keys: %s", lastKeys.toString()));
-        lines.add(String.format("Last tap: x=%s, y=%s, pointer=%s, button=%s", lastTapScreenX, lastTapScreenY, lastTapPointer, lastTapButton));
-        lines.add(String.format("Players: %s  |  Current: %s", GlobalWorld.entities.size(),
-                GlobalWorld.player != null ? GlobalWorld.player.toString() : "None"));
+        cachedStatus.add(String.format("Mouse: %.0f, %.0f  |  Focus: %s",
+                mousePositionX, mousePositionY, focused ? "Yes" : "No"));
+        OrthoTileHit tileHit = TopDownMapWorld.getLastHit();
+        if(tileHit != null){
+            cachedStatus.add(String.format("Tile: [%d,%d] id=%d %s",
+                    tileHit.getCol(), tileHit.getRow(), tileHit.getTileId(),
+                    tileHit.isInBounds() ? "OK" : "OOB"));
+        }
+        cachedStatus.add(String.format("Cam follow: %s  |  Pan: %s",
+                WorldCameraControl.isFollowEnabled() ? "ON" : "OFF",
+                WorldCameraControl.isPanning() ? "drag" : "-"));
+
+        int playables = 0;
+        int blocks = 0;
+        List<String> inactive = new ArrayList<>();
         for(Entity entity : GlobalWorld.entities){
+            if(DebugEntityService.isMapBlock(entity)){
+                blocks++;
+                continue;
+            }
+            playables++;
             SelectableModule selectable = SelectableModule.from(entity);
-            if(selectable == null || !selectable.isActive()){
-                lines.add("Inactive: " + entity.toString());
+            if(selectable != null && !selectable.isActive()){
+                inactive.add(entity.getTAG());
             }
         }
-        lines.add(String.format("Vision modules: %s", VisionDebug.getActiveModuleCount()));
-        for(String line : VisionDebug.collectBackgroundThreadLines()){
-            lines.add(line);
+        cachedStatus.add(String.format("Entities: %d playable + %d blocks", playables, blocks));
+        cachedStatus.add("Current: " + (GlobalWorld.player != null ? GlobalWorld.player.getTAG() : "None"));
+        for(String tag : inactive){
+            cachedStatus.add("Inactive: " + tag);
         }
-        lines.add(String.format("Vision lines: %s  |  Overlay: %s",
+        cachedStatus.add(String.format("Vision: %s modules | lines %s | overlay %s",
+                VisionDebug.getActiveModuleCount(),
                 DebugFeatures.isVisionLinesVisible() ? "ON" : "OFF",
                 DebugFeatures.isOverlayVisible() ? "ON" : "OFF"));
-        return lines;
     }
 
-    public void draw() {
-        if (active) {
-            ColumnText columnText = new ColumnText(messages, collectStatusLines().toArray(new String[0]));
-            columnText.scrollOffset = scrollOffset;
-            columnText.draw();
-            height = columnText.height;
-            width = columnText.width;
+    private void store(Message message) {
+        synchronized(messages){
+            messages.add(message);
+            while(messages.size() > MAX_STORED_MESSAGES){
+                messages.remove(0);
+            }
         }
     }
 
@@ -142,7 +278,7 @@ public class MyLogger implements ApplicationLogger {
     @Override
     public void log(String tag, String message) {
         writeLog(DebugLogEntry.Level.LOG, tag, message, false);
-        messages.add(new Message(MessageLevel.LOG, tag, message));
+        store(new Message(MessageLevel.LOG, tag, message));
     }
 
     @Override
@@ -151,13 +287,13 @@ public class MyLogger implements ApplicationLogger {
         if(exception != null){
             exception.printStackTrace(System.out);
         }
-        messages.add(new Message(MessageLevel.LOG, tag, message));
+        store(new Message(MessageLevel.LOG, tag, message));
     }
 
     @Override
     public void error(String tag, String message) {
         writeLog(DebugLogEntry.Level.ERROR, tag, message, true);
-        messages.add(new Message(MessageLevel.ERROR, tag, message));
+        store(new Message(MessageLevel.ERROR, tag, message));
     }
 
     @Override
@@ -166,13 +302,13 @@ public class MyLogger implements ApplicationLogger {
         if(exception != null){
             exception.printStackTrace(System.err);
         }
-        messages.add(new Message(MessageLevel.ERROR, tag, message));
+        store(new Message(MessageLevel.ERROR, tag, message));
     }
 
     @Override
     public void debug(String tag, String message) {
         writeLog(DebugLogEntry.Level.DEBUG, tag, message, false);
-        messages.add(new Message(MessageLevel.DEBUG, tag, message));
+        store(new Message(MessageLevel.DEBUG, tag, message));
     }
 
     @Override
@@ -181,149 +317,47 @@ public class MyLogger implements ApplicationLogger {
         if(exception != null){
             exception.printStackTrace(System.out);
         }
-        messages.add(new Message(MessageLevel.DEBUG, tag, message));
+        store(new Message(MessageLevel.DEBUG, tag, message));
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public float getHeight() {
+        return height;
     }
 }
 
-class ColumnText {
-    String[] strings;
-    List<Message> messages = new ArrayList<>();
-    float width = 0;
-    float height = 0;
-    float scrollOffset = 0;
+class Message {
+    final MessageLevel level;
+    final String tag;
+    final String message;
 
-    public ColumnText(List<Message> messages, String... strings) {
-        this.strings = strings;
-        this.messages = messages;
-    }
-
-    public void draw() {
-        String ender = "____________________________";
-        float displayHeight = Gdx.graphics.getHeight();
-        List<Float> sizes = new ArrayList<>();
-        List<Float> positions = new ArrayList<>();
-        float maxWidth = 0;
-        float enderHeight = 0;
-        for (String topText : strings) {
-            GlyphLayout layout = Views.preDrawText(topText);
-            sizes.add(layout.height);
-            if (maxWidth < layout.width) {
-                maxWidth = layout.width;
-            }
-        }
-        GlyphLayout layout = Views.preDrawText(ender);
-        if (maxWidth < layout.width) {
-            maxWidth = layout.width;
-        }
-        enderHeight = layout.height;
-        for (int i = 0; i < strings.length; i++) {
-            float margin = 10;
-            float startY = displayHeight - sizes.get(0) - margin + scrollOffset;
-            if (i == 0) {
-                positions.add(startY);
-            }
-            if (i != 0) {
-                float calculatedY = startY;
-                for (int j = i; j > 0; j--) {
-                    calculatedY -= sizes.get(j);
-                    calculatedY -= margin;
-                }
-                positions.add(calculatedY);
-            }
-        }
-        List<Float> sizedBottom = new ArrayList<>();
-        List<Float> bottomPositions = new ArrayList<>();
-
-        for(Message bottomTest : messages){
-            GlyphLayout bottomLayout = Views.preDrawText(bottomTest.toString());
-            sizedBottom.add(bottomLayout.height);
-            if (maxWidth < bottomLayout.width) {
-                maxWidth = bottomLayout.width;
-            } 
-        }
-
-        for(int i = 0; i < messages.size(); i++ ){
-            float margin = 10;
-            float startY = positions.get(positions.size() - 1) - 10*2 - enderHeight;
-            float calculatedY = startY;
-            if(i>0){
-                for (int j = i; j > 0; j--) {
-                    calculatedY -= sizedBottom.get(j);
-                    calculatedY -= margin;
-                }
-            }
-            bottomPositions.add(calculatedY);
-        }
-
-        float rectHeight;
-        float y;
-        if(!bottomPositions.isEmpty()){
-            rectHeight =  (displayHeight - bottomPositions.get(bottomPositions.size() - 1)) + sizedBottom.get(sizedBottom.size() - 1);
-            y = bottomPositions.get(bottomPositions.size() - 1) - sizedBottom.get(sizedBottom.size() - 1) - 10;
-        }else{
-            rectHeight = (displayHeight - positions.get(positions.size() - 1)) + sizes.get(sizes.size() - 1);
-            y = positions.get(positions.size() - 1) - sizes.get(sizes.size() - 1) - 10;
-        }
-        drawRect(y, maxWidth,
-                rectHeight);
-        MainService.getInstance().getFont().setColor(new Color(0.78f, 0.88f, 0.95f, 1f));
-        for (int i = 0; i < strings.length; i++) {
-            Views.drawText(strings[i], new ViewPosition(10, positions.get(i)));
-        }
-        if(!messages.isEmpty()){
-            Views.drawText(ender, new ViewPosition(0, positions.get(positions.size() - 1) - 5));
-        }
-
-        for (int i = 0; i < messages.size(); i++) {
-            MainService.getInstance().getFont().setColor(messages.get(i).level.getColor());
-            Views.drawText(messages.get(i).toString(), new ViewPosition(10, bottomPositions.get(i)));
-        }
-
-        MainService.getInstance().getFont().setColor(Color.WHITE);
-        width = maxWidth + 20;
-        height = rectHeight;
-    }
-
-    void drawRect(float y, float width, float height) {
-        Gdx.gl.glEnable(GL30.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
-        MainService.getInstance().getSpriteBatch().end();
-        MainService.getInstance().getShapeRenderer().begin(ShapeType.Filled);
-        MainService.getInstance().getShapeRenderer().setColor(0.08f, 0.09f, 0.12f, 0.82f);
-        MainService.getInstance().getShapeRenderer().rect(0, y, width + 20, height + 10);
-        MainService.getInstance().getShapeRenderer().end();
-        MainService.getInstance().getShapeRenderer().begin(ShapeType.Line);
-        MainService.getInstance().getShapeRenderer().setColor(0.25f, 0.28f, 0.35f, 0.95f);
-        MainService.getInstance().getShapeRenderer().rect(0, y, width + 20, height + 10);
-        MainService.getInstance().getShapeRenderer().end();
-        Gdx.gl.glDisable(GL30.GL_BLEND);
-        MainService.getInstance().getSpriteBatch().begin();
-    }
-}
-class Message{
-    MessageLevel level;
-    String tag;
-    String message;
-    Message(MessageLevel level, String tag, String message){
+    Message(MessageLevel level, String tag, String message) {
         this.level = level;
         this.tag = tag;
         this.message = message;
     }
+
     @Override
-    public String toString(){   
-        return String.format("[%s]%s: %s",level,tag, message);
+    public String toString() {
+        return String.format("[%s]%s: %s", level, tag, message);
     }
 }
-enum MessageLevel{
-    LOG(Color.GREEN),
-    ERROR(Color.RED),
-    DEBUG(Color.CYAN);
+
+enum MessageLevel {
+    LOG(new Color(0.35f, 0.9f, 0.4f, 1f)),
+    ERROR(new Color(1f, 0.35f, 0.35f, 1f)),
+    DEBUG(new Color(0.35f, 0.85f, 1f, 1f));
+
     private final Color color;
 
-    public Color getColor(){
-        return color;
-    }
-    MessageLevel(Color color){
+    MessageLevel(Color color) {
         this.color = color;
+    }
+
+    public Color getColor() {
+        return color;
     }
 }

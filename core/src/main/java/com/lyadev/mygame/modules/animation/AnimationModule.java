@@ -1,13 +1,13 @@
 package com.lyadev.mygame.modules.animation;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.lyadev.mygame.base.Entity;
 import com.lyadev.mygame.base.EntityModule;
+import com.lyadev.mygame.debug.ModuleDebugPanel;
 import com.lyadev.mygame.enums.MoveType;
 import com.lyadev.mygame.modules.movement.MovementModule;
+import com.lyadev.mygame.modules.texture.EntityTexture;
 import com.lyadev.mygame.modules.texture.TextureModule;
 
 import lombok.Getter;
@@ -34,10 +34,13 @@ public class AnimationModule extends EntityModule {
 
     @Override
     public void init() {
-        require(MovementModule.class);
-        require(TextureModule.class).getEntityTexture().setAnimatedFrame(
+        MovementModule movement = require(MovementModule.class);
+        EntityTexture texture = require(TextureModule.class).getEntityTexture();
+        MoveType facing = movement.getFacingDirection();
+        texture.setFlipHorizontal(shouldFlipHorizontal(settings.getDirectionMode(), facing));
+        texture.setAnimatedFrame(
                 settings.getIdle().getId(),
-                0,
+                rowForFacing(settings.getDirectionMode(), facing),
                 0);
     }
 
@@ -54,18 +57,67 @@ public class AnimationModule extends EntityModule {
         }
 
         AnimationClip clip = clipForState(activeState);
-        int row = rowForDirection(movement.getFacingDirection());
+        MoveType facing = movement.getFacingDirection();
+        int row = rowForFacing(settings.getDirectionMode(), facing);
+        boolean flip = shouldFlipHorizontal(settings.getDirectionMode(), facing);
         advanceFrame(clip, delta);
 
-        textureModule.getEntityTexture().setAnimatedFrame(clip.getId(), row, frameIndex);
+        EntityTexture entityTexture = textureModule.getEntityTexture();
+        entityTexture.setFlipHorizontal(flip);
+        entityTexture.setAnimatedFrame(clip.getId(), row, frameIndex);
     }
 
     public String getActiveClipId() {
         return clipForState(activeState).getId();
     }
 
+    @Override
+    public void populateDebugScreen(ModuleDebugPanel panel) {
+        super.populateDebugScreen(panel);
+        if(!isEnabled()){
+            return;
+        }
+        MovementModule movement = require(MovementModule.class);
+        panel.line("state", activeState);
+        panel.line("clip", getActiveClipId());
+        panel.line("frame", frameIndex);
+        panel.line("facing", movement.getFacingDirection());
+        panel.line("directionMode", settings.getDirectionMode());
+        panel.line("flipHorizontal", require(TextureModule.class).getEntityTexture().isFlipHorizontal());
+        panel.line("moving", movement.isMoving());
+        panel.action("reset_animation", "Reset to idle");
+    }
+
+    @Override
+    public String handleDebugAction(String actionId) {
+        if("reset_animation".equals(actionId)){
+            activeState = AnimationState.IDLE;
+            frameIndex = 0;
+            frameTimer = 0f;
+            require(TextureModule.class).getEntityTexture().setFlipHorizontal(
+                    shouldFlipHorizontal(settings.getDirectionMode(), require(MovementModule.class).getFacingDirection()));
+            require(TextureModule.class).getEntityTexture().setAnimatedFrame(
+                    settings.getIdle().getId(),
+                    rowForFacing(settings.getDirectionMode(), require(MovementModule.class).getFacingDirection()),
+                    0);
+            return "Animation reset to idle";
+        }
+        return super.handleDebugAction(actionId);
+    }
+
     public static AnimationModule from(Entity entity) {
         return entity.getModule(AnimationModule.class);
+    }
+
+    private static int rowForFacing(AnimationDirectionMode mode, MoveType direction) {
+        if(mode == AnimationDirectionMode.MIRROR_HORIZONTAL){
+            return 0;
+        }
+        return rowForDirection(direction);
+    }
+
+    private static boolean shouldFlipHorizontal(AnimationDirectionMode mode, MoveType direction) {
+        return mode == AnimationDirectionMode.MIRROR_HORIZONTAL && direction == MoveType.LEFT;
     }
 
     private AnimationState resolveState(MovementModule movement) {
@@ -96,6 +148,9 @@ public class AnimationModule extends EntityModule {
             return 2;
         }
         if(direction == MoveType.UP){
+            return 0;
+        }
+        if(direction == MoveType.DOWN){
             return 3;
         }
         return 0;

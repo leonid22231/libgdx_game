@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.lyadev.mygame.modules.animation.AnimationModule;
 import com.lyadev.mygame.modules.sprite.SpriteModule;
+import com.lyadev.mygame.modules.visionmouse.VisionMouseModule;
 import com.lyadev.mygame.utils.Position;
 import com.lyadev.mygame.utils.Size;
 
@@ -41,6 +42,7 @@ public class Entity extends Actor {
     @Override
     public void act(float delta) {
         EntityModule deferredVisualModule = null;
+        VisionMouseModule visionMouseModule = null;
         for(EntityModule module : modules){
             if(!module.isRuntimeActive()){
                 continue;
@@ -49,7 +51,14 @@ public class Entity extends Actor {
                 deferredVisualModule = module;
                 continue;
             }
+            if(module instanceof VisionMouseModule){
+                visionMouseModule = (VisionMouseModule) module;
+                continue;
+            }
             module.act(delta);
+        }
+        if(visionMouseModule != null && visionMouseModule.isRuntimeActive()){
+            visionMouseModule.act(delta);
         }
         if(deferredVisualModule != null && deferredVisualModule.isRuntimeActive()){
             deferredVisualModule.act(delta);
@@ -61,6 +70,15 @@ public class Entity extends Actor {
         for(EntityModule module : modules){
             if(module.isRuntimeActive()){
                 module.draw(batch, parentAlpha);
+            }
+        }
+    }
+
+    /** Screen-space UI pass — see {@link EntityModule#drawUi}. */
+    public void drawUi(Batch batch, float parentAlpha) {
+        for(EntityModule module : modules){
+            if(module.isRuntimeActive()){
+                module.drawUi(batch, parentAlpha);
             }
         }
     }

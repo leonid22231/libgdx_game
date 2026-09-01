@@ -1,0 +1,14 @@
+{
+  "tileset": "tiles/topdown/Tileset.png",
+  "tileSize": 16,
+  "columns": 8,
+  "note": "id = row*8+col. Classified by average color from sheet.",
+  "known": {
+    "0-5": "grass variants",
+    "6-7": "dirt",
+    "8-13": "grass variants",
+    "14-15": "dirt",
+    "86,89,110,111": "water / pond (teal)",
+    "empty": "36,46,47,48-50,56-58,60,64-66,70,71,92,104-109,112-117"
+  }
+}

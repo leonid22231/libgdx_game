@@ -10,7 +10,6 @@ import com.lyadev.mygame.base.Entity;
 import com.lyadev.mygame.base.EntityModule;
 import com.lyadev.mygame.base.ModuleEventChannel;
 import com.lyadev.mygame.modules.movement.MovementModule;
-import com.lyadev.mygame.modules.selectable.SelectableModule;
 import com.lyadev.mygame.modules.vision.EntitySpottedEvent;
 import com.lyadev.mygame.modules.vision.VisionModule;
 
@@ -18,7 +17,7 @@ import com.lyadev.mygame.modules.vision.VisionModule;
  * Справочный модуль — <b>не подключать в игру</b>, только читать как шпаргалку.
  * Живой пример всего API: {@link com.lyadev.mygame.modules.ai.AiBrainModule}.
  *
- * <p>См. также {@code modules/example/README.md}.
+ * <p>Полная документация: {@code modules/example/README.md}
  */
 public class ExampleModule extends EntityModule {
 
@@ -70,6 +69,26 @@ public class ExampleModule extends EntityModule {
     @Override
     public List<Class<? extends EntityModule>> getRequiredModules() {
         return List.of(VisionModule.class, MovementModule.class);
+    }
+
+    // =========================================================================
+    // 4b. КЛАВИШИ (объявить как getRequiredModules, реализовать в onKeyBinding)
+    // =========================================================================
+    // getKeyBindings() → ModuleInputRegistry.resolve(this) вместе с deps.
+    // Описание видно в Debug Console → Keys / команда `keys`.
+    // =========================================================================
+
+    @Override
+    public List<com.lyadev.mygame.base.ModuleKeyDecl> getKeyBindings() {
+        // Пример (не активен в игре — модуль не подключают):
+        // return List.of(
+        //     ModuleKeyDecl.down("ping", ModuleKeyChord.of(Keys.P), "Example ping"));
+        return List.of();
+    }
+
+    @Override
+    protected void onKeyBinding(String actionId, com.lyadev.mygame.base.ModuleKeyEvent event) {
+        // switch(actionId) { case "ping": ... }
     }
 
     // =========================================================================
@@ -148,12 +167,23 @@ public class ExampleModule extends EntityModule {
     }
 
     // =========================================================================
-    // 8. draw(batch) — опционально, после act
+    // 8. draw(batch) — world pass (камера мира)
+    // =========================================================================
+    // Не делайте batch.end()/ShapeRenderer на каждого entity — общий проход снаружи.
     // =========================================================================
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        // Debug-отрисовка через MainService.getShapeRenderer() — см. VisionModule.draw
+        // World debug — см. VisionDebug.drawOverlays
+    }
+
+    // =========================================================================
+    // 8b. drawUi(batch) — screen HUD (после мира, см. docs/modules/ui-layer.md)
+    // =========================================================================
+
+    @Override
+    public void drawUi(Batch batch, float parentAlpha) {
+        // Inventory / HP bar — пиксели экрана, камера не влияет
     }
 
     // =========================================================================

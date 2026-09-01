@@ -5,6 +5,7 @@ import java.util.List;
 import com.badlogic.gdx.Gdx;
 
 import com.lyadev.mygame.base.EntityModule;
+import com.lyadev.mygame.modules.live.LiveModule;
 import com.lyadev.mygame.modules.movement.MovementModule;
 import com.lyadev.mygame.modules.vision.VisionModule;
 
@@ -29,11 +30,10 @@ public class AiBrainModule extends EntityModule {
                 getEntity().getTAG()
                     + " spotted "
                     + event.getTarget().getTAG());
-            MovementModule targetModule = event.getTarget().getModule(MovementModule.class);
+            LiveModule targetModule = event.getTarget().getModule(LiveModule.class);
             if(targetModule != null){
-                targetModule.rotate();
+                targetModule.hit(10);
             }
-
         });
     }
 }

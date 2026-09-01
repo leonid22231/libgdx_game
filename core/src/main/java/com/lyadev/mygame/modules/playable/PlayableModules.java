@@ -2,11 +2,13 @@ package com.lyadev.mygame.modules.playable;
 
 import com.lyadev.mygame.base.Entity;
 import com.lyadev.mygame.modules.animation.AnimationModule;
+import com.lyadev.mygame.modules.camera.CameraFollowModule;
 import com.lyadev.mygame.modules.movement.MovementModule;
 import com.lyadev.mygame.modules.selectable.SelectableModule;
 import com.lyadev.mygame.modules.sprite.SpriteModule;
 import com.lyadev.mygame.modules.texture.TextureModule;
 import com.lyadev.mygame.modules.vision.VisionModule;
+import com.lyadev.mygame.modules.visionmouse.VisionMouseModule;
 
 public final class PlayableModules {
     private PlayableModules() {
@@ -30,6 +32,7 @@ public final class PlayableModules {
         entity.registerModule(new MovementModule(blueprint.getMovement()));
         entity.registerModule(new VisionModule(blueprint.getVision()));
         entity.registerModule(new SelectableModule());
+        entity.registerModule(new CameraFollowModule());
     }
 
     /** Grid sheets idle/walk/run + AnimationModule (newgirl). */
@@ -39,5 +42,17 @@ public final class PlayableModules {
         entity.registerModule(new MovementModule(blueprint.getMovement()));
         entity.registerModule(new VisionModule(blueprint.getVision()));
         entity.registerModule(new SelectableModule());
+        entity.registerModule(new VisionMouseModule());
+        entity.registerModule(new CameraFollowModule());
+    }
+
+    public static void registerPetModules(Entity entity, AnimatedPlayableBlueprint blueprint){
+        entity.registerModule(TextureModule.forAnimation(blueprint.getAnimation()));
+        entity.registerModule(new AnimationModule(blueprint.getAnimation()));
+        entity.registerModule(new MovementModule(blueprint.getMovement()));
+        entity.registerModule(new VisionModule(blueprint.getVision()));
+        entity.registerModule(new SelectableModule());
+        entity.registerModule(new VisionMouseModule());
+        entity.registerModule(new CameraFollowModule());
     }
 }

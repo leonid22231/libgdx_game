@@ -2,17 +2,15 @@ package com.lyadev.mygame.modules.vision;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import java.util.function.Consumer;
 
 import com.lyadev.mygame.base.Entity;
 import com.lyadev.mygame.base.EntityModule;
 import com.lyadev.mygame.base.ModuleEventChannel;
-import com.lyadev.mygame.debug.DebugFeatures;
-import com.lyadev.mygame.enums.MoveType;
+import com.lyadev.mygame.debug.ModuleDebugPanel;
 import com.lyadev.mygame.modules.movement.MovementModule;
 import com.lyadev.mygame.modules.selectable.SelectableModule;
-import com.lyadev.mygame.services.MainService;
 import com.lyadev.mygame.utils.CircleSector;
 import com.lyadev.mygame.utils.LineFromRect;
 import com.lyadev.mygame.utils.Position;
@@ -31,6 +29,7 @@ public class VisionModule extends EntityModule {
     private volatile boolean backgroundReady = false;
     private float currentDegrees1 = 0;
     private float currentDegrees2 = 0;
+    private Float debugRadiusOverride;
 
     @Override
     public String getName() {
@@ -58,17 +57,7 @@ public class VisionModule extends EntityModule {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        if(!DebugFeatures.isVisionLinesVisible() || visionTracker == null){
-            return;
-        }
-        SelectableModule selectable = SelectableModule.from(getEntity());
-        if(selectable != null && !selectable.shouldRender()){
-            return;
-        }
-        batch.end();
-        visionTracker.drawContour();
-        drawDebugVision();
-        batch.begin();
+        // Vision debug shapes are batched once via VisionDebug.drawOverlays after stage.draw.
     }
 
     @Override
@@ -137,7 +126,7 @@ public class VisionModule extends EntityModule {
     }
 
     float getVisionScore() {
-        return settings.getVisibleRadius();
+        return debugRadiusOverride != null ? debugRadiusOverride : settings.getVisibleRadius();
     }
 
     Position getCenterPosition() {
@@ -165,6 +154,46 @@ public class VisionModule extends EntityModule {
 
     public int getVisibleEntityCount() {
         return visionTracker == null ? 0 : visionTracker.getVisibleEntityCount();
+    }
+
+    @Override
+    public void populateDebugScreen(ModuleDebugPanel panel) {
+        super.populateDebugScreen(panel);
+        updateVisionDegrees();
+        panel.line("visibleRadius", getVisionScore());
+        panel.line("visibleCount", getVisibleEntityCount());
+        panel.line("backgroundReady", backgroundReady);
+        panel.line("coneHalfDegrees", VISION_DEGREES / 2f);
+        panel.line("coneFrom", String.format("%.1f°", currentDegrees1));
+        panel.line("coneTo", String.format("%.1f°", currentDegrees2));
+        panel.numberField("visible_radius", "Visible radius", getVisionScore(), 20d, 800d);
+        panel.action("reset_vision", "Reset vision tracking");
+    }
+
+    @Override
+    public String handleDebugFieldChange(String fieldId, String value) {
+        if("visible_radius".equals(fieldId)){
+            try {
+                float radius = Float.parseFloat(value);
+                if(radius <= 0f){
+                    return "Radius must be > 0";
+                }
+                debugRadiusOverride = radius;
+                return "Visible radius: " + radius;
+            } catch(NumberFormatException error) {
+                return "Invalid number: " + value;
+            }
+        }
+        return super.handleDebugFieldChange(fieldId, value);
+    }
+
+    @Override
+    public String handleDebugAction(String actionId) {
+        if("reset_vision".equals(actionId)){
+            resetVisionTracking();
+            return "Vision tracking reset";
+        }
+        return super.handleDebugAction(actionId);
     }
 
     public static VisionModule from(Entity entity) {
@@ -230,40 +259,27 @@ public class VisionModule extends EntityModule {
     }
 
     private void updateVisionDegrees() {
-        MoveType facing = MoveType.DOWN;
+        float center = -90f;
         MovementModule movementModule = MovementModule.from(getEntity());
         if(movementModule != null){
-            facing = movementModule.getFacingDirection();
+            center = movementModule.getLookAngleForVision();
         }
 
-        float deg = VISION_DEGREES / 2;
-        float degrees1 = deg;
-        float degrees2 = deg * -1;
-        float round = 180 - deg * 2;
-        switch(facing){
-            case DOWN:
-                degrees1 = (90 - deg) * -1;
-                degrees2 = (90 + deg) * -1;
-                break;
-            case UP:
-                degrees1 = (90 + deg);
-                degrees2 = (90 - deg);
-                break;
-            case LEFT:
-                degrees1 = (deg + round) * -1;
-                degrees2 = deg + round;
-                break;
-            case RIGHT:
-                degrees1 = deg;
-                degrees2 = deg * -1;
-                break;
-        }
-        currentDegrees1 = degrees1;
-        currentDegrees2 = degrees2;
+        float half = VISION_DEGREES / 2f;
+        currentDegrees1 = center + half;
+        currentDegrees2 = center - half;
     }
 
-    private void drawDebugVision() {
+    /** Called from {@link VisionDebug#drawOverlays} inside one ShapeRenderer begin/end. */
+    void drawDebugShapes(ShapeRenderer shape) {
+        if(visionTracker == null){
+            return;
+        }
         SelectableModule selectable = SelectableModule.from(getEntity());
+        if(selectable != null && !selectable.shouldRender()){
+            return;
+        }
+        visionTracker.drawContour(shape);
         if(selectable == null || !selectable.isActive()){
             return;
         }
@@ -274,16 +290,14 @@ public class VisionModule extends EntityModule {
             return;
         }
 
-        double x = center.getX() + radius * Math.cos(Math.toRadians(currentDegrees1));
-        double y = center.getY() + radius * Math.sin(Math.toRadians(currentDegrees1));
-        double x1 = center.getX() + radius * Math.cos(Math.toRadians(currentDegrees2));
-        double y1 = center.getY() + radius * Math.sin(Math.toRadians(currentDegrees2));
+        float x = center.getX() + radius * (float) Math.cos(Math.toRadians(currentDegrees1));
+        float y = center.getY() + radius * (float) Math.sin(Math.toRadians(currentDegrees1));
+        float x1 = center.getX() + radius * (float) Math.cos(Math.toRadians(currentDegrees2));
+        float y1 = center.getY() + radius * (float) Math.sin(Math.toRadians(currentDegrees2));
 
-        MainService.getInstance().getShapeRenderer().begin(ShapeType.Line);
-        MainService.getInstance().getShapeRenderer().setColor(Color.YELLOW);
-        MainService.getInstance().getShapeRenderer().circle(center.getX(), center.getY(), radius);
-        MainService.getInstance().getShapeRenderer().line(center.getX(), center.getY(), (float) x, (float) y);
-        MainService.getInstance().getShapeRenderer().line(center.getX(), center.getY(), (float) x1, (float) y1);
-        MainService.getInstance().getShapeRenderer().end();
+        shape.setColor(Color.YELLOW);
+        shape.circle(center.getX(), center.getY(), radius, 28);
+        shape.line(center.getX(), center.getY(), x, y);
+        shape.line(center.getX(), center.getY(), x1, y1);
     }
 }

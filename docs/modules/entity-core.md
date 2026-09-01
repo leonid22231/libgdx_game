@@ -49,12 +49,18 @@ modules/
 ## Сборка playable
 
 ```java
-PlayableBlueprint blueprint = GlobalWorld.buildPlayableBlueprint(
-        "Man", Assets.PERSON_MAN, visibleRadius);
+Entity entity = ManPerson.create();
+GlobalWorld.addEntity(entity);
 
-Entity entity = new Entity(blueprint.getTag());
-PlayableModules.register(entity, blueprint);
+// runtime / debug spawn (сразу на stage):
+Entity extra = ManPerson.spawnUnique();
 ```
+
+`ManPerson.registerModules(...)` — явный список модулей внутри класса персонажа.
+`create()` — entity + модули + `resolveModules()`.  
+`spawn()` / `spawnUnique()` — `create()` + `PersonWorld.adopt()` (список + stage).
+
+Настройки — пакет `com.lyadev.mygame.persons.*` (папка на каждого: `man/`, `cat/`, …).
 
 `PlayableBlueprint` — агрегат module settings для фабрики. Живёт только при создании сущности.
 

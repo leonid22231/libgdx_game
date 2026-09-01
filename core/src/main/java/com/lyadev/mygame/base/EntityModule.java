@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+
+import com.lyadev.mygame.debug.ModuleDebugPanel;
+
 import java.util.function.Consumer;
 
 public abstract class EntityModule {
@@ -35,6 +38,22 @@ public abstract class EntityModule {
      */
     public List<Class<? extends EntityModule>> getRequiredModules() {
         return Collections.emptyList();
+    }
+
+    /**
+     * Declarative key / chord list (like {@link #getRequiredModules()}).
+     * Resolved together by {@link ModuleInputRegistry#resolve(EntityModule)}.
+     * Handle in {@link #onKeyBinding(String, ModuleKeyEvent)}.
+     */
+    public List<ModuleKeyDecl> getKeyBindings() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Implementation for actions declared in {@link #getKeyBindings()}.
+     * {@code actionId} is the local id from the decl (without module name prefix).
+     */
+    protected void onKeyBinding(String actionId, ModuleKeyEvent event) {
     }
 
     public List<String> getRequiredModuleNames() {
@@ -107,8 +126,60 @@ public abstract class EntityModule {
     public void draw(Batch batch, float parentAlpha) {
     }
 
+    /**
+     * Screen-space UI (HUD). Called after the world pass with screen projection —
+     * not affected by the world camera. Override for inventory, HP bars, etc.
+     */
+    public void drawUi(Batch batch, float parentAlpha) {
+    }
+
     public void dispose() {
+        ModuleInputRegistry.unregisterModule(this);
         clearEventSubscriptions();
+    }
+
+    /**
+     * Debug Console: строки и кнопки для вкладки Entities (клик по модулю).
+     * Вызывается на game thread.
+     */
+    public void populateDebugScreen(ModuleDebugPanel panel) {
+        panel.line("module", getName());
+        panel.line("enabled", isEnabled());
+        panel.line("runtimeActive", isRuntimeActive());
+        if(!isEnabled() && disabledReason != null){
+            panel.line("disabledReason", disabledReason);
+        }
+        panel.checkbox("runtime_paused", "Runtime paused", isRuntimePaused());
+    }
+
+    /**
+     * Debug Console: чекбоксы и поля ввода из {@link #populateDebugScreen(ModuleDebugPanel)}.
+     * @return сообщение для UI или {@code null}, если field не обработан
+     */
+    public String handleDebugFieldChange(String fieldId, String value) {
+        if("runtime_paused".equals(fieldId)){
+            if(!isEnabled()){
+                return "Module is disabled at resolve";
+            }
+            setRuntimePaused(Boolean.parseBoolean(value));
+            return isRuntimePaused() ? "Runtime paused" : "Runtime resumed";
+        }
+        return null;
+    }
+
+    /**
+     * Debug Console: обработка кнопок из {@link #populateDebugScreen(ModuleDebugPanel)}.
+     * @return сообщение для UI или {@code null}, если action не обработан
+     */
+    public String handleDebugAction(String actionId) {
+        if("toggle_pause".equals(actionId)){
+            if(!isEnabled()){
+                return "Module is disabled at resolve";
+            }
+            setRuntimePaused(!isRuntimePaused());
+            return isRuntimePaused() ? "Runtime paused" : "Runtime resumed";
+        }
+        return null;
     }
 
     static void beginInit(EntityModule module) {

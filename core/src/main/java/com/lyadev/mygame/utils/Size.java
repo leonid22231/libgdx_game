@@ -16,7 +16,13 @@ public class Size {
     private int height;
 
     public Size getSizeFromScaleFactor(int scaleFactor) {
-        return new Size(width * scaleFactor, height * scaleFactor);
+        return getSizeFromScaleFactor((float) scaleFactor);
+    }
+
+    public Size getSizeFromScaleFactor(float scaleFactor) {
+        return new Size(
+                Math.max(1, Math.round(width * scaleFactor)),
+                Math.max(1, Math.round(height * scaleFactor)));
     }
 
     @Override

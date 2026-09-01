@@ -2,8 +2,15 @@ package com.lyadev.mygame.debug;
 
 import java.util.function.Consumer;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public final class DebugFeatures {
+    @Getter
+    @Setter
     private static boolean visionLinesVisible = false;
+    @Getter
+    @Setter
     private static boolean overlayVisible = false;
     private static Consumer<DebugLogEntry> externalLogSink;
 
@@ -11,24 +18,8 @@ public final class DebugFeatures {
         throw new UnsupportedOperationException();
     }
 
-    public static boolean isVisionLinesVisible() {
-        return visionLinesVisible;
-    }
-
-    public static void setVisionLinesVisible(boolean visible) {
-        visionLinesVisible = visible;
-    }
-
     public static void toggleVisionLines() {
         visionLinesVisible = !visionLinesVisible;
-    }
-
-    public static boolean isOverlayVisible() {
-        return overlayVisible;
-    }
-
-    public static void setOverlayVisible(boolean visible) {
-        overlayVisible = visible;
     }
 
     public static void toggleOverlay() {

@@ -11,7 +11,9 @@ alwaysApply: true
 ## Слои кода
 
 - `base/` — `Entity`, `EntityModule`, `ModuleRegistry`, `ModuleInitializationService`
-- `modules/` — `texture/`, `sprite/`, `movement/`, `vision/`, `selectable/`, `playable/`, `ai/`
+- `modules/` — `texture/`, `sprite/`, `movement/`, `vision/`, `selectable/`, `playable/`, `ai/`, `door/`
+- `world/` — инфраструктура мира: `WorldEntity`, `JsonMapWorld`, `WorldController`, `GlobalWorld`, `topdown/`, tiles/props/doors
+- `worlds/` — конкретные карты (`ForestLakeWorld`, `HouseInteriorWorld`); регистрация — `Worlds.registerAll()`
 - Модули инкапсулированы; общаются только друг с другом (`require`, `Module.from`). См. `docs/modules/communication.md`
 - Lombok: `@Getter`, `@Setter`, `@AllArgsConstructor`, `@RequiredArgsConstructor`, `@Builder`
 
@@ -20,7 +22,7 @@ alwaysApply: true
 - Сервисы: lazy singleton через `getInstance()` (`MainService`)
 - Мир: статические поля/методы в `GlobalWorld`
 - Настройки: статический `SettingsService.init()`
-- Константы путей: `Assets` (только `public static final String`)
+- Пути к ассетам: строки в коде / JSON карт (`assets/maps/`, `assets/tiles/topdown/`)
 
 ## LibGDX lifecycle
 
@@ -33,14 +35,12 @@ dispose() → MainService.getInstance().dispose()
 
 ## Scene2D и рендер
 
-- Игровые объекты: `extends Actor` (`Entity`, `Place`)
+- Игровые объекты: `extends Actor` (`Entity` + map actors)
 - Мир добавляет акторов: `stage.addActor(entity)` в `GlobalWorld.init`
 - Цикл: `stage.act(delta)` → `stage.draw()`
 - ShapeRenderer между batch: `batch.end()` → shape → `batch.begin()`
 - Рендер-сервисы берут ресурсы через `MainService.getInstance()`
 - Текстуры загружать один раз в `init()`, освобождать в `dispose()`
-
-- `world/` — `GlobalWorld` (статические списки и `player`)
 
 ## Entity (lean core)
 
@@ -56,6 +56,6 @@ PlayableModules.register(entity, blueprint);  // settings → модули
 
 ## Gradle / ассеты
 
-- Игровые ассеты: `assets/`, пути в `Assets.java`
+- Игровые ассеты: `assets/`
 - Desktop run: `workingDir = assets`, launcher — `Lwjgl3Launcher`
 - Иконки окна: `lwjgl3/src/main/resources/libgdx*.png`

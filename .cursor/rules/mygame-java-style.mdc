@@ -35,7 +35,6 @@ K&R, допускается без пробела перед `{` (как в пр
 
 ```java
 public class Entity extends Actor {
-public class Place extends Actor{
     if(!allEntityInit){
     if (entity == null) {
 ```
@@ -97,4 +96,4 @@ public String toString() {
 | Утилиты | `utils/` |
 | Enum | `enums/` |
 | DTO/настройки (legacy) | `models/` |
-| Пути к ассетам | `Assets.java` |
+| Карты / тайлы | `world/topdown/`, `assets/maps/` |

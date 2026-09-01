@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.lyadev.mygame.base.Entity;
 import com.lyadev.mygame.base.EntityModule;
+import com.lyadev.mygame.debug.ModuleDebugPanel;
 import com.lyadev.mygame.models.MoveEventSetting;
 import com.lyadev.mygame.modules.movement.MovementModule;
 import com.lyadev.mygame.modules.texture.TextureModule;
@@ -61,6 +62,17 @@ public class SpriteModule extends EntityModule {
             }
         }
         return moveEvents[0].getSpriteNumber();
+    }
+
+    @Override
+    public void populateDebugScreen(ModuleDebugPanel panel) {
+        super.populateDebugScreen(panel);
+        if(!isEnabled()){
+            return;
+        }
+        panel.line("spriteIndex", getCurrentSpriteIndex());
+        panel.line("facing", require(MovementModule.class).getFacingDirection());
+        panel.line("regions", require(TextureModule.class).getEntityTexture().getAllTextureRegions().size());
     }
 
     public static SpriteModule from(Entity entity) {
