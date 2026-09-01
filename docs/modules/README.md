@@ -64,7 +64,7 @@ VisionModule, SelectableModule — без deps
 - [Зависимости модулей](./dependencies.md)
 - [ExampleModule — шпаргалка](../../core/src/main/java/com/lyadev/mygame/modules/example/README.md)
 - [UI-слой модулей](./ui-layer.md)
-- [Клавиши модулей](../../core/src/main/java/com/lyadev/mygame/base/README-input.md)
+- [Клавиши модулей](../../core/src/main/java/com/lyadev/mygame/base/entity/README-input.md)
 - [Debug Console](./debug-console.md)
 
 ## План

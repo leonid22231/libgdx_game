@@ -1,6 +1,6 @@
 package com.lyadev.mygame.modules.vision;
 
-import com.lyadev.mygame.base.Entity;
+import com.lyadev.mygame.base.entity.Entity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

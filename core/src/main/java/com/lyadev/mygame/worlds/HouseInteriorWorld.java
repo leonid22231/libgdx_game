@@ -2,7 +2,7 @@ package com.lyadev.mygame.worlds;
 
 import com.badlogic.gdx.Gdx;
 import com.lyadev.mygame.modules.door.DoorSettings;
-import com.lyadev.mygame.world.JsonMapWorld;
+import com.lyadev.mygame.base.world.JsonMapWorld;
 
 /** Small interior test house. */
 public final class HouseInteriorWorld extends JsonMapWorld {

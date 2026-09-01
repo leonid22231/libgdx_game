@@ -4,17 +4,17 @@ import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.lyadev.mygame.base.ModuleInputRegistry;
-import com.lyadev.mygame.base.ModuleKeyChord;
-import com.lyadev.mygame.base.ModuleKeyDecl;
-import com.lyadev.mygame.base.ModuleKeyEvent;
+import com.lyadev.mygame.base.entity.ModuleInputRegistry;
+import com.lyadev.mygame.base.entity.ModuleKeyChord;
+import com.lyadev.mygame.base.entity.ModuleKeyDecl;
+import com.lyadev.mygame.base.entity.ModuleKeyEvent;
 import com.lyadev.mygame.debug.DebugFeatures;
-import com.lyadev.mygame.world.GlobalWorld;
-import com.lyadev.mygame.world.WorldCameraControl;
-import com.lyadev.mygame.world.topdown.OrthoMapEditor;
+import com.lyadev.mygame.base.world.GlobalWorld;
+import com.lyadev.mygame.base.world.WorldCameraControl;
+import com.lyadev.mygame.base.world.topdown.OrthoMapEditor;
 
 /**
- * System key declarations (same shape as {@link com.lyadev.mygame.base.EntityModule#getKeyBindings()}).
+ * System key declarations (same shape as {@link com.lyadev.mygame.base.entity.EntityModule#getKeyBindings()}).
  */
 public final class GameSystemKeyBindings {
     private static final String OWNER = "system";

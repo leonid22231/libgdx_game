@@ -14,10 +14,10 @@ import com.lyadev.mygame.debug.DebugFeatures;
 import com.lyadev.mygame.debug.DebugSelectionHighlight;
 import com.lyadev.mygame.MyLogger.MyLogger;
 import com.lyadev.mygame.modules.vision.VisionDebug;
-import com.lyadev.mygame.world.GlobalWorld;
-import com.lyadev.mygame.world.WorldCameraSettings;
-import com.lyadev.mygame.world.topdown.OrthoMapEditor;
-import com.lyadev.mygame.world.topdown.TopDownMapWorld;
+import com.lyadev.mygame.base.world.GlobalWorld;
+import com.lyadev.mygame.base.world.WorldCameraSettings;
+import com.lyadev.mygame.base.world.topdown.OrthoMapEditor;
+import com.lyadev.mygame.base.world.topdown.TopDownMapWorld;
 
 public class MainService {
     private static MainService instance;

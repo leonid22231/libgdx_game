@@ -3,17 +3,17 @@ package com.lyadev.mygame.modules.door;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
-import com.lyadev.mygame.base.Entity;
-import com.lyadev.mygame.base.EntityModule;
+import com.lyadev.mygame.base.entity.Entity;
+import com.lyadev.mygame.base.entity.EntityModule;
 import com.lyadev.mygame.debug.ModuleDebugPanel;
 import com.lyadev.mygame.modules.prop.PropModule;
 import com.lyadev.mygame.modules.selectable.SelectableModule;
 import com.lyadev.mygame.modules.tile.TileBlockModule;
-import com.lyadev.mygame.world.GlobalWorld;
-import com.lyadev.mygame.world.WorldController;
+import com.lyadev.mygame.base.world.GlobalWorld;
+import com.lyadev.mygame.base.world.WorldController;
 
 /**
- * Decor trigger: overlapping active player travels to another {@link com.lyadev.mygame.world.WorldEntity}.
+ * Decor trigger: overlapping active player travels to another {@link com.lyadev.mygame.base.world.WorldEntity}.
  */
 public class DoorModule extends EntityModule {
     private static final String TAG = "DoorModule";

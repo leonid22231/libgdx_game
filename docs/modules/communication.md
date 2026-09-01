@@ -17,7 +17,7 @@
 | Debug | `VisionModule.from(entity).getVisibleEntityCount()` |
 | MyLogger | `VisionDebug.collectBackgroundThreadLines()` — debug-facade пакета |
 | UI HUD | `EntityModule.drawUi` — screen-space, см. [ui-layer.md](./ui-layer.md) |
-| Клавиши | `getKeyBindings()` + `onKeyBinding` — как deps; см. `base/README-input.md` |
+| Клавиши | `getKeyBindings()` + `onKeyBinding` — как deps; см. `base/entity/README-input.md` |
 
 ## Что нельзя
 

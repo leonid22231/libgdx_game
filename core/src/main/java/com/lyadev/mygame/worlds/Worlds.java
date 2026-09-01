@@ -1,10 +1,10 @@
 package com.lyadev.mygame.worlds;
 
-import com.lyadev.mygame.world.WorldController;
+import com.lyadev.mygame.base.world.WorldController;
 
 /**
  * Registers concrete playable worlds with {@link WorldController}.
- * Add new maps here — keep infrastructure in {@code com.lyadev.mygame.world}.
+ * Add new maps here — keep infrastructure in {@code com.lyadev.mygame.base.world}.
  */
 public final class Worlds {
     private Worlds() {

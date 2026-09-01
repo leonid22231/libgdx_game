@@ -1,6 +1,6 @@
 package com.lyadev.mygame.modules.playable;
 
-import com.lyadev.mygame.base.Entity;
+import com.lyadev.mygame.base.entity.Entity;
 import com.lyadev.mygame.modules.animation.AnimationModule;
 import com.lyadev.mygame.modules.camera.CameraFollowModule;
 import com.lyadev.mygame.modules.movement.MovementModule;

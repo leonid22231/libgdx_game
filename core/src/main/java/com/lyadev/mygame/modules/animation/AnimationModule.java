@@ -2,8 +2,8 @@ package com.lyadev.mygame.modules.animation;
 
 import java.util.List;
 
-import com.lyadev.mygame.base.Entity;
-import com.lyadev.mygame.base.EntityModule;
+import com.lyadev.mygame.base.entity.Entity;
+import com.lyadev.mygame.base.entity.EntityModule;
 import com.lyadev.mygame.debug.ModuleDebugPanel;
 import com.lyadev.mygame.enums.MoveType;
 import com.lyadev.mygame.modules.movement.MovementModule;

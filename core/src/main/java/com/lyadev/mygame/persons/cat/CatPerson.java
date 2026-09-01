@@ -1,7 +1,7 @@
 package com.lyadev.mygame.persons.cat;
 
-import com.lyadev.mygame.base.Entity;
-import com.lyadev.mygame.base.EntityModule;
+import com.lyadev.mygame.base.entity.Entity;
+import com.lyadev.mygame.base.entity.EntityModule;
 import com.lyadev.mygame.modules.animation.AnimationClip;
 import com.lyadev.mygame.modules.animation.AnimationDirectionMode;
 import com.lyadev.mygame.modules.animation.AnimationModule;
@@ -17,7 +17,7 @@ import com.lyadev.mygame.persons.PersonBlueprints;
 import com.lyadev.mygame.persons.PersonTags;
 import com.lyadev.mygame.persons.PersonWorld;
 import com.lyadev.mygame.utils.Size;
-import com.lyadev.mygame.world.WorldController;
+import com.lyadev.mygame.base.world.WorldController;
 
 public final class CatPerson {
     public static final String TAG = "Cat";

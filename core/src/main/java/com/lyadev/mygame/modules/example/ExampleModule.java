@@ -6,9 +6,9 @@ import java.util.function.Consumer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 
-import com.lyadev.mygame.base.Entity;
-import com.lyadev.mygame.base.EntityModule;
-import com.lyadev.mygame.base.ModuleEventChannel;
+import com.lyadev.mygame.base.entity.Entity;
+import com.lyadev.mygame.base.entity.EntityModule;
+import com.lyadev.mygame.base.entity.ModuleEventChannel;
 import com.lyadev.mygame.modules.movement.MovementModule;
 import com.lyadev.mygame.modules.vision.EntitySpottedEvent;
 import com.lyadev.mygame.modules.vision.VisionModule;
@@ -79,7 +79,7 @@ public class ExampleModule extends EntityModule {
     // =========================================================================
 
     @Override
-    public List<com.lyadev.mygame.base.ModuleKeyDecl> getKeyBindings() {
+    public List<com.lyadev.mygame.base.entity.ModuleKeyDecl> getKeyBindings() {
         // Пример (не активен в игре — модуль не подключают):
         // return List.of(
         //     ModuleKeyDecl.down("ping", ModuleKeyChord.of(Keys.P), "Example ping"));
@@ -87,7 +87,7 @@ public class ExampleModule extends EntityModule {
     }
 
     @Override
-    protected void onKeyBinding(String actionId, com.lyadev.mygame.base.ModuleKeyEvent event) {
+    protected void onKeyBinding(String actionId, com.lyadev.mygame.base.entity.ModuleKeyEvent event) {
         // switch(actionId) { case "ping": ... }
     }
 

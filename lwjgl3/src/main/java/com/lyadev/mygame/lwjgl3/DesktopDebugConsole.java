@@ -63,7 +63,7 @@ import com.lyadev.mygame.debug.DebugSelectionHighlight;
 import com.lyadev.mygame.debug.DebugWorldService;
 import com.lyadev.mygame.debug.DebugWorldSnapshot;
 import com.lyadev.mygame.services.MainService;
-import com.lyadev.mygame.world.GlobalWorld;
+import com.lyadev.mygame.base.world.GlobalWorld;
 
 public final class DesktopDebugConsole {
     private static final Color BG = color(0x11111b);
@@ -910,8 +910,8 @@ public final class DesktopDebugConsole {
             return;
         }
         Gdx.app.postRunnable(() -> {
-            List<com.lyadev.mygame.base.ModuleKeyDebugRow> rows =
-                    com.lyadev.mygame.base.ModuleInputRegistry.collectDebugRows();
+            List<com.lyadev.mygame.base.entity.ModuleKeyDebugRow> rows =
+                    com.lyadev.mygame.base.entity.ModuleInputRegistry.collectDebugRows();
             String signature = keysSignature(rows);
             SwingUtilities.invokeLater(() -> {
                 if(keysTableModel == null || keysTable == null){
@@ -922,7 +922,7 @@ public final class DesktopDebugConsole {
                 }
                 lastKeysSignature = signature;
                 keysTableModel.setRowCount(0);
-                for(com.lyadev.mygame.base.ModuleKeyDebugRow row : rows){
+                for(com.lyadev.mygame.base.entity.ModuleKeyDebugRow row : rows){
                     keysTableModel.addRow(new Object[]{
                             row.getChord(),
                             row.getActionId(),
@@ -935,9 +935,9 @@ public final class DesktopDebugConsole {
         });
     }
 
-    private static String keysSignature(List<com.lyadev.mygame.base.ModuleKeyDebugRow> rows) {
+    private static String keysSignature(List<com.lyadev.mygame.base.entity.ModuleKeyDebugRow> rows) {
         StringBuilder builder = new StringBuilder();
-        for(com.lyadev.mygame.base.ModuleKeyDebugRow row : rows){
+        for(com.lyadev.mygame.base.entity.ModuleKeyDebugRow row : rows){
             builder.append(row.getChord()).append('|')
                     .append(row.getActionId()).append('|')
                     .append(row.getOwner()).append('|')

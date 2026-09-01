@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 
-import com.lyadev.mygame.base.EntityModule;
+import com.lyadev.mygame.base.entity.EntityModule;
 import com.lyadev.mygame.modules.live.LiveModule;
 import com.lyadev.mygame.modules.movement.MovementModule;
 import com.lyadev.mygame.modules.vision.VisionModule;

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
-import com.lyadev.mygame.base.Entity;
-import com.lyadev.mygame.base.EntityModule;
+import com.lyadev.mygame.base.entity.Entity;
+import com.lyadev.mygame.base.entity.EntityModule;
 import com.lyadev.mygame.modules.animation.AnimationModule;
 import com.lyadev.mygame.modules.prop.PropModule;
 import com.lyadev.mygame.modules.selectable.SelectableModule;
@@ -16,7 +16,7 @@ import com.lyadev.mygame.persons.cat.CatPerson;
 import com.lyadev.mygame.persons.man.ManPerson;
 import com.lyadev.mygame.persons.newgirl.NewgirlPerson;
 import com.lyadev.mygame.persons.woomen.WoomenPerson;
-import com.lyadev.mygame.world.GlobalWorld;
+import com.lyadev.mygame.base.world.GlobalWorld;
 
 public final class DebugEntityService {
     private DebugEntityService() {

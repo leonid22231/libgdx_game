@@ -1,6 +1,6 @@
 package com.lyadev.mygame.debug;
 
-/** Snapshot of a registered {@link com.lyadev.mygame.world.WorldEntity} for the debug console. */
+/** Snapshot of a registered {@link com.lyadev.mygame.base.world.WorldEntity} for the debug console. */
 public final class DebugWorldSnapshot {
     public final String id;
     public final String displayName;

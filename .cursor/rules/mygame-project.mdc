@@ -10,10 +10,10 @@ alwaysApply: true
 
 ## Слои кода
 
-- `base/` — `Entity`, `EntityModule`, `ModuleRegistry`, `ModuleInitializationService`
-- `modules/` — `texture/`, `sprite/`, `movement/`, `vision/`, `selectable/`, `playable/`, `ai/`, `door/`
-- `world/` — инфраструктура мира: `WorldEntity`, `JsonMapWorld`, `WorldController`, `GlobalWorld`, `topdown/`, tiles/props/doors
+- `base/entity/` — `Entity`, `EntityModule`, `ModuleRegistry`, `ModuleInitializationService`, key bindings
+- `base/world/` — инфраструктура мира: `WorldEntity`, `JsonMapWorld`, `WorldController`, `GlobalWorld`, `topdown/`, tiles/props/doors
 - `worlds/` — конкретные карты (`ForestLakeWorld`, `HouseInteriorWorld`); регистрация — `Worlds.registerAll()`
+- `modules/` — `texture/`, `sprite/`, `movement/`, `vision/`, `selectable/`, `playable/`, `ai/`, `door/`
 - Модули инкапсулированы; общаются только друг с другом (`require`, `Module.from`). См. `docs/modules/communication.md`
 - Lombok: `@Getter`, `@Setter`, `@AllArgsConstructor`, `@RequiredArgsConstructor`, `@Builder`
 

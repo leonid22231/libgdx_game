@@ -4,12 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
-import com.lyadev.mygame.base.ModuleInputRegistry;
+import com.lyadev.mygame.base.entity.ModuleInputRegistry;
 import com.lyadev.mygame.modules.selectable.SelectableModule;
-import com.lyadev.mygame.world.GlobalWorld;
-import com.lyadev.mygame.world.WorldCameraControl;
-import com.lyadev.mygame.world.topdown.OrthoMapEditor;
-import com.lyadev.mygame.world.topdown.TopDownMapWorld;
+import com.lyadev.mygame.base.world.GlobalWorld;
+import com.lyadev.mygame.base.world.WorldCameraControl;
+import com.lyadev.mygame.base.world.topdown.OrthoMapEditor;
+import com.lyadev.mygame.base.world.topdown.TopDownMapWorld;
 
 /**
  * Thin input dispatcher. Key bindings live in modules / {@link GameSystemKeyBindings}.

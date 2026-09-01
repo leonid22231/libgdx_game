@@ -37,4 +37,4 @@ protected void onKeyBinding(String actionId, ModuleKeyEvent event) {
 | `active` / `visibleByVision` | да |
 | иначе | нет |
 
-См. `base/README-input.md`.
+См. `base/entity/README-input.md`.

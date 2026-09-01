@@ -3,7 +3,7 @@ package com.lyadev.mygame.debug;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Builder для {@link com.lyadev.mygame.base.EntityModule#populateDebugScreen(ModuleDebugPanel)}. */
+/** Builder для {@link com.lyadev.mygame.base.entity.EntityModule#populateDebugScreen(ModuleDebugPanel)}. */
 public final class ModuleDebugPanel {
     private final List<ModuleDebugLine> lines = new ArrayList<>();
     private final List<ModuleDebugField> fields = new ArrayList<>();

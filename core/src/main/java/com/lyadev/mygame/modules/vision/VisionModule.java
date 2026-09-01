@@ -5,16 +5,16 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import java.util.function.Consumer;
 
-import com.lyadev.mygame.base.Entity;
-import com.lyadev.mygame.base.EntityModule;
-import com.lyadev.mygame.base.ModuleEventChannel;
+import com.lyadev.mygame.base.entity.Entity;
+import com.lyadev.mygame.base.entity.EntityModule;
+import com.lyadev.mygame.base.entity.ModuleEventChannel;
 import com.lyadev.mygame.debug.ModuleDebugPanel;
 import com.lyadev.mygame.modules.movement.MovementModule;
 import com.lyadev.mygame.modules.selectable.SelectableModule;
 import com.lyadev.mygame.utils.CircleSector;
 import com.lyadev.mygame.utils.LineFromRect;
 import com.lyadev.mygame.utils.Position;
-import com.lyadev.mygame.world.GlobalWorld;
+import com.lyadev.mygame.base.world.GlobalWorld;
 
 import lombok.RequiredArgsConstructor;
 

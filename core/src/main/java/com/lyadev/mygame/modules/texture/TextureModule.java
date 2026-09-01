@@ -2,8 +2,8 @@ package com.lyadev.mygame.modules.texture;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.lyadev.mygame.base.Entity;
-import com.lyadev.mygame.base.EntityModule;
+import com.lyadev.mygame.base.entity.Entity;
+import com.lyadev.mygame.base.entity.EntityModule;
 import com.lyadev.mygame.debug.ModuleDebugPanel;
 import com.lyadev.mygame.modules.animation.AnimationSettings;
 import com.lyadev.mygame.modules.selectable.SelectableModule;

@@ -5,17 +5,17 @@ import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.lyadev.mygame.base.Entity;
-import com.lyadev.mygame.base.EntityModule;
-import com.lyadev.mygame.base.ModuleKeyChord;
-import com.lyadev.mygame.base.ModuleKeyDecl;
-import com.lyadev.mygame.base.ModuleKeyEvent;
+import com.lyadev.mygame.base.entity.Entity;
+import com.lyadev.mygame.base.entity.EntityModule;
+import com.lyadev.mygame.base.entity.ModuleKeyChord;
+import com.lyadev.mygame.base.entity.ModuleKeyDecl;
+import com.lyadev.mygame.base.entity.ModuleKeyEvent;
 import com.lyadev.mygame.debug.ModuleDebugPanel;
 import com.lyadev.mygame.enums.MoveType;
 import com.lyadev.mygame.modules.selectable.SelectableModule;
 import com.lyadev.mygame.modules.visionmouse.VisionMouseModule;
-import com.lyadev.mygame.world.GlobalWorld;
-import com.lyadev.mygame.world.topdown.OrthoMapEditor;
+import com.lyadev.mygame.base.world.GlobalWorld;
+import com.lyadev.mygame.base.world.topdown.OrthoMapEditor;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

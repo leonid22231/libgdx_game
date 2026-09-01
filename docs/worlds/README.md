@@ -4,9 +4,9 @@
 
 | Пакет | Что внутри |
 |-------|------------|
-| `com.lyadev.mygame.world` | Инфраструктура: `WorldEntity`, `JsonMapWorld`, `WorldController`, `GlobalWorld`, camera, `topdown/`, tiles/props/doors factories |
-| `com.lyadev.mygame.worlds` | Конкретные карты: `ForestLakeWorld`, `HouseInteriorWorld`, регистрация через `Worlds.registerAll()` |
-| `com.lyadev.mygame.base` | `Entity`, модули registry / input |
+| `com.lyadev.mygame.base.entity` | `Entity`, `EntityModule`, registry, key bindings |
+| `com.lyadev.mygame.base.world` | `WorldEntity`, `JsonMapWorld`, `WorldController`, `GlobalWorld`, `topdown/`, tiles/props/doors |
+| `com.lyadev.mygame.worlds` | Конкретные карты: `ForestLakeWorld`, `HouseInteriorWorld`, `Worlds.registerAll()` |
 | `com.lyadev.mygame.modules` | Игровые модули (movement, door, …) |
 
 ```
@@ -19,7 +19,7 @@ WorldController.travel(HouseInteriorWorld.ID, traveler, col, row);
 |-------|------|
 | `WorldEntity` | id, entities, load / activate / deactivate |
 | `JsonMapWorld` | JSON top-down map (tiles, props, portals helper) |
-| `ForestLakeWorld` / `HouseInteriorWorld` | concrete worlds + `installPortals()` in `worlds/` |
+| `ForestLakeWorld` / `HouseInteriorWorld` | concrete worlds in `worlds/` |
 | `Worlds` | register all concrete worlds |
 | `WorldController` | registry, `getActive()`, `travel` / `switchActive` |
 | `TopDownMapWorld` | thin facade → active `JsonMapWorld` (editor) |

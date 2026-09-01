@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.lyadev.mygame.base.Entity;
+import com.lyadev.mygame.base.entity.Entity;
 import com.lyadev.mygame.utils.LineFromRect;
 import com.lyadev.mygame.utils.Point;
 

@@ -1,7 +1,7 @@
 # Карты (top-down)
 
 Миры — объекты `WorldEntity` (см. [`docs/worlds/README.md`](../worlds/README.md)).
-Инфраструктура: `com.lyadev.mygame.world.*`. Конкретные карты: `com.lyadev.mygame.worlds.*`.
+Инфраструктура: `com.lyadev.mygame.base.world.*`. Конкретные карты: `com.lyadev.mygame.worlds.*`.
 Карта по умолчанию — `ForestLakeWorld` → `maps/forest_lake.json`.
 Тестовый интерьер — `HouseInteriorWorld` → `maps/house_interior.json`.
 

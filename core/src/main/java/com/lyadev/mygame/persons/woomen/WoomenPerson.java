@@ -1,7 +1,7 @@
 package com.lyadev.mygame.persons.woomen;
 
-import com.lyadev.mygame.base.Entity;
-import com.lyadev.mygame.base.EntityModule;
+import com.lyadev.mygame.base.entity.Entity;
+import com.lyadev.mygame.base.entity.EntityModule;
 import com.lyadev.mygame.modules.camera.CameraFollowModule;
 import com.lyadev.mygame.modules.movement.MovementModule;
 import com.lyadev.mygame.modules.playable.PlayableBlueprint;
@@ -12,7 +12,7 @@ import com.lyadev.mygame.modules.vision.VisionModule;
 import com.lyadev.mygame.persons.PersonBlueprints;
 import com.lyadev.mygame.persons.PersonTags;
 import com.lyadev.mygame.persons.PersonWorld;
-import com.lyadev.mygame.world.WorldController;
+import com.lyadev.mygame.base.world.WorldController;
 
 public final class WoomenPerson {
     public static final String TAG = "Woomen";

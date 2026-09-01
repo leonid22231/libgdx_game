@@ -1,7 +1,7 @@
 package com.lyadev.mygame.persons.newgirl;
 
-import com.lyadev.mygame.base.Entity;
-import com.lyadev.mygame.base.EntityModule;
+import com.lyadev.mygame.base.entity.Entity;
+import com.lyadev.mygame.base.entity.EntityModule;
 import com.lyadev.mygame.modules.animation.AnimationClip;
 import com.lyadev.mygame.modules.animation.AnimationModule;
 import com.lyadev.mygame.modules.animation.AnimationSettings;
@@ -17,7 +17,7 @@ import com.lyadev.mygame.persons.PersonBlueprints;
 import com.lyadev.mygame.persons.PersonTags;
 import com.lyadev.mygame.persons.PersonWorld;
 import com.lyadev.mygame.utils.Size;
-import com.lyadev.mygame.world.WorldController;
+import com.lyadev.mygame.base.world.WorldController;
 
 public final class NewgirlPerson {
     public static final String TAG = "Newgirl";

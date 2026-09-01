@@ -2,7 +2,7 @@ package com.lyadev.mygame.persons;
 
 import java.util.List;
 
-import com.lyadev.mygame.base.Entity;
+import com.lyadev.mygame.base.entity.Entity;
 
 public final class PersonTags {
     private PersonTags() {

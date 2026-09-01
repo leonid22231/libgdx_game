@@ -2,7 +2,7 @@ package com.lyadev.mygame.worlds;
 
 import com.badlogic.gdx.Gdx;
 import com.lyadev.mygame.modules.door.DoorSettings;
-import com.lyadev.mygame.world.JsonMapWorld;
+import com.lyadev.mygame.base.world.JsonMapWorld;
 
 /** Outdoor forest map — default start world. */
 public final class ForestLakeWorld extends JsonMapWorld {

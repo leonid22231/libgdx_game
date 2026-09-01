@@ -181,7 +181,7 @@ protected void onKeyBinding(String actionId, ModuleKeyEvent event) {
 ```
 
 Resolve: `ModuleInputRegistry` при `resolveModules()`. Debug: вкладка Keys / `keys`.  
-Подробнее: `base/README-input.md`.
+Подробнее: `base/entity/README-input.md`.
 
 ---
 

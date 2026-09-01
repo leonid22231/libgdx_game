@@ -4,12 +4,12 @@ import java.util.List;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.lyadev.mygame.base.Entity;
-import com.lyadev.mygame.base.EntityModule;
+import com.lyadev.mygame.base.entity.Entity;
+import com.lyadev.mygame.base.entity.EntityModule;
 import com.lyadev.mygame.debug.ModuleDebugPanel;
 import com.lyadev.mygame.modules.selectable.SelectableModule;
 import com.lyadev.mygame.services.MainService;
-import com.lyadev.mygame.world.WorldCameraControl;
+import com.lyadev.mygame.base.world.WorldCameraControl;
 
 /**
  * Moves the world camera to the active entity center.

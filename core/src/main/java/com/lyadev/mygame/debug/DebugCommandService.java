@@ -1,8 +1,8 @@
 package com.lyadev.mygame.debug;
 
-import com.lyadev.mygame.base.Entity;
+import com.lyadev.mygame.base.entity.Entity;
 import com.lyadev.mygame.services.MainService;
-import com.lyadev.mygame.world.GlobalWorld;
+import com.lyadev.mygame.base.world.GlobalWorld;
 
 public final class DebugCommandService {
     private DebugCommandService() {
@@ -62,7 +62,7 @@ public final class DebugCommandService {
     }
 
     private static String listKeyBindings() {
-        java.util.List<String> lines = com.lyadev.mygame.base.ModuleInputRegistry.collectDebugLines();
+        java.util.List<String> lines = com.lyadev.mygame.base.entity.ModuleInputRegistry.collectDebugLines();
         if(lines.isEmpty()){
             return "No key bindings registered";
         }

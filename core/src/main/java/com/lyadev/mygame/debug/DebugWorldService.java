@@ -3,11 +3,11 @@ package com.lyadev.mygame.debug;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.lyadev.mygame.base.Entity;
-import com.lyadev.mygame.world.GlobalWorld;
-import com.lyadev.mygame.world.WorldController;
-import com.lyadev.mygame.world.WorldEntity;
-import com.lyadev.mygame.world.topdown.OrthoMapData;
+import com.lyadev.mygame.base.entity.Entity;
+import com.lyadev.mygame.base.world.GlobalWorld;
+import com.lyadev.mygame.base.world.WorldController;
+import com.lyadev.mygame.base.world.WorldEntity;
+import com.lyadev.mygame.base.world.topdown.OrthoMapData;
 
 /** Debug helpers for listing / switching {@link WorldEntity} instances. */
 public final class DebugWorldService {

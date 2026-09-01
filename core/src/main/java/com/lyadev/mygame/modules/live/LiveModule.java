@@ -1,6 +1,6 @@
 package com.lyadev.mygame.modules.live;
 
-import com.lyadev.mygame.base.EntityModule;
+import com.lyadev.mygame.base.entity.EntityModule;
 import com.lyadev.mygame.debug.ModuleDebugPanel;
 
 public class LiveModule extends EntityModule {
